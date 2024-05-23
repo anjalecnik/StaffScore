@@ -5,7 +5,9 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import { Dashboard } from './components/Dashboard';
 import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
-import Layout from './layout/Layout';
+import { TeamList } from './components/Teams/List/Teams';
+import { UserList } from './components/Users/Users';
+import { TeamShow } from './components/Teams/TeamShow';
 
 export default function App() {
   return (
@@ -22,6 +24,13 @@ export default function App() {
           show={ShowGuesser}
           recordRepresentation="name"
           icon={UserIcon}
+        />
+        <Resource
+          name="teams"
+          list={TeamList}
+          show={TeamShow}
+          recordRepresentation="name"
+          icon={GroupsIcon}
         />
       </Admin>
     </>
