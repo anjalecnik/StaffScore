@@ -2,6 +2,7 @@ import { Login } from 'react-admin';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from './../config/firebase';
 import { useNavigate } from 'react-router-dom';
+import './../assets/auth.css';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
