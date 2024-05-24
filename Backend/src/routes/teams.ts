@@ -32,8 +32,6 @@ router.get("/:id", async (req, res) => {
 
     const team = { id: id, ...querySnapshot };
 
-    console.log(team);
-
     if (!querySnapshot.empty) {
       res.json(team);
     } else {

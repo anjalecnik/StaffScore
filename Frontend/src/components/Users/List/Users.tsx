@@ -10,6 +10,7 @@ import {
   SortButton
 } from 'react-admin';
 import UserIcon from '@mui/icons-material/Group';
+import { CustomerAvatar } from './CustomAvatar';
 
 export const UserList = () => {
   const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
@@ -33,6 +34,7 @@ export const UserList = () => {
           />
         ) : (
           <Datagrid rowClick="show">
+            <CustomerAvatar size="small" />
             <TextField source="displayName" />
             <TextField source="email" />
           </Datagrid>
