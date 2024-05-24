@@ -1,14 +1,14 @@
 import { Admin, Resource, ShowGuesser } from 'react-admin';
 import { dataProvider } from './dataProvider';
-import { UserList } from './components/Users';
-import { PostCreate, PostEdit, PostList } from './components/Posts';
-import PostIcon from '@mui/icons-material/Book';
 import UserIcon from '@mui/icons-material/Group';
+import GroupsIcon from '@mui/icons-material/Groups';
 import { Dashboard } from './components/Dashboard';
 import { authProvider } from './authProvider';
-import './assets/auth.css';
 import { LoginPage } from './components/LoginPage';
-import Layout from './layout/Layout';
+import { TeamList } from './components/Teams/List/Teams';
+import { UserList } from './components/Users/List/Users';
+import { TeamShow } from './components/Teams/TeamShow';
+import { UserCreate } from './components/Users/Create/UserCreate';
 
 export default function App() {
   return (
@@ -18,23 +18,25 @@ export default function App() {
         dataProvider={dataProvider}
         dashboard={Dashboard}
         loginPage={LoginPage}
-        layout={Layout}
       >
-        <Resource
-          name="posts"
-          list={PostList}
-          edit={PostEdit}
-          create={PostCreate}
-          icon={PostIcon}
-        />
         <Resource
           name="users"
           list={UserList}
           show={ShowGuesser}
+          create={UserCreate}
           recordRepresentation="name"
           icon={UserIcon}
+        />
+        <Resource
+          name="teams"
+          list={TeamList}
+          show={TeamShow}
+          recordRepresentation="name"
+          icon={GroupsIcon}
         />
       </Admin>
     </>
   );
 }
+
+0;
