@@ -31,7 +31,7 @@ export default function App() {
           name="teams"
           list={TeamList}
           show={TeamShow}
-          recordRepresentation="name"
+          recordRepresentation="displayName"
           icon={GroupsIcon}
         />
       </Admin>

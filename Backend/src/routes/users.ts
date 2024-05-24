@@ -1,23 +1,48 @@
 import { Router } from "express";
 import { db } from "../config/firebase";
-import { getDocs, collection, addDoc } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  query,
+  orderBy,
+  limit,
+  startAt,
+  OrderByDirection,
+  addDoc,
+} from "firebase/firestore";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const usersSnapshot = await getDocs(collection(db, "users"));
-    const users = usersSnapshot.docs.map((doc) => ({
+    const { _end, _order, _sort, _start } = req.query;
+
+    const end = parseInt(_end as string, 10) || 10;
+    const start = parseInt(_start as string, 10) || 0;
+    const order = (_order as string) === "DESC" ? "asc" : "asc"; // TODO: enable filtering by desc (https://www.reddit.com/r/Firebase/comments/16p5a4d/pagination_with_sorting_and_filtering/)
+    let sortField = typeof _sort === "string" ? _sort : "lastModified";
+
+    if (sortField == "id") sortField = "lastModified";
+
+    const usersSnapshot = await query(
+      collection(db, "users"),
+      orderBy(sortField, order),
+      startAt(start),
+      limit(end - start)
+    );
+
+    const users = await getDocs(usersSnapshot);
+
+    const formattedUsers = users.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    res.setHeader("X-Total-Count", users.length.toString());
+    res.setHeader("X-Total-Count", formattedUsers.length.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
 
-    res.json(users);
+    res.json(formattedUsers);
   } catch (error) {
-    console.error("Error getting users", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -30,7 +55,6 @@ router.post("/", async (req, res) => {
       email: email,
     });
   } catch (error) {
-    console.error("Error creating user:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
