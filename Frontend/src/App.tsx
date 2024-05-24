@@ -14,6 +14,7 @@ export default function App() {
   return (
     <>
       <Admin
+        title="StaffScore"
         authProvider={authProvider}
         dataProvider={dataProvider}
         dashboard={Dashboard}
@@ -38,5 +39,3 @@ export default function App() {
     </>
   );
 }
-
-0;
