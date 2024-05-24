@@ -12,7 +12,7 @@ export const LoginPage = () => {
       const result = await signInWithPopup(auth, googleProvider);
 
       try {
-        const response = await fetch('http://localhost:3000/api/users/check-user', {
+        const response = await fetch('https://staff-score.vercel.app/api/users/check-user', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
