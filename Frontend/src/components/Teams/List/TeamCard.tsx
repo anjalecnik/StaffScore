@@ -21,7 +21,7 @@ export const TeamCard = (props: { record?: ITeam }) => {
     <MuiLink
       component={Link}
       to={createPath({
-        resource: 'companies',
+        resource: 'teams',
         id: record.id,
         type: 'show'
       })}

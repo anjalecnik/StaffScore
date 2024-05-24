@@ -6,8 +6,9 @@ import { Dashboard } from './components/Dashboard';
 import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
 import { TeamList } from './components/Teams/List/Teams';
-import { UserList } from './components/Users/Users';
+import { UserList } from './components/Users/List/Users';
 import { TeamShow } from './components/Teams/TeamShow';
+import { UserCreate } from './components/Users/Create/UserCreate';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           name="users"
           list={UserList}
           show={ShowGuesser}
+          create={UserCreate}
           recordRepresentation="name"
           icon={UserIcon}
         />

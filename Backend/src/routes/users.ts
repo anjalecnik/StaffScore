@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "../config/firebase";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, addDoc } from "firebase/firestore";
 
 const router = Router();
 
@@ -18,6 +18,19 @@ router.get("/", async (_req, res) => {
     res.json(users);
   } catch (error) {
     console.error("Error getting users", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    await addDoc(collection(db, "users"), {
+      email: email,
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

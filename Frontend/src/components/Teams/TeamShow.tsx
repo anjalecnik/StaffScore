@@ -1,11 +1,13 @@
-import { useShowController, SelectField, SimpleShowLayout, TextField, Title } from 'react-admin';
+import { useShowController, SimpleShowLayout, TextField, Title } from 'react-admin';
 import { Card, CardContent, Container } from '@mui/material';
+import { ITeam } from '../../types/ITeam';
 
 export const TeamShow = () => {
   const { record } = useShowController();
+  console.log(record as ITeam);
   return (
     <Container>
-      <Title title={`Edit book ${record?.title}`} />
+      <Title title={`Team ${record?.name}`} />
       <Card>
         <CardContent>
           <SimpleShowLayout record={record}>
