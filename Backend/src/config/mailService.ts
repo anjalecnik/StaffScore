@@ -34,6 +34,7 @@ export const sendMail = async (
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       logger.error(error);
+      logger.error(`Full error: ${JSON.stringify(error, null, 2)}`);
     } else {
       logger.info("Email sent: " + info.response);
     }
