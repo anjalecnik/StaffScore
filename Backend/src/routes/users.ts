@@ -13,6 +13,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
 
@@ -182,6 +183,27 @@ router.put("/:userId", async (req, res) => {
     res.status(200).json(updatedUserData);
   } catch (error) {
     console.error("Error updating user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** DELETE user */
+router.delete("/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (!userDocSnapshot.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    await deleteDoc(userDocRef);
+
+    res.status(200).json();
+  } catch (error) {
+    console.error("Error deleting user:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
