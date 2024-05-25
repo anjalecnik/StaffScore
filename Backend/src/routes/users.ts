@@ -10,12 +10,16 @@ import {
   addDoc,
   serverTimestamp,
   where,
+  doc,
+  getDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
 
 const axios = require("axios");
 const router = Router();
 
+/** GET all users */
 router.get("/", async (req, res) => {
   try {
     const { _end, _order, _sort, _start } = req.query;
@@ -50,6 +54,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+/** GET by document id */
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -97,6 +102,86 @@ router.get("/:id", async (req, res) => {
     }
   } catch (error) {
     console.error("Error getting user by id:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** CREATE new user */
+router.post("/", async (req, res) => {
+  const { email, ...otherAttributes } = req.body;
+
+  try {
+    const newUserRef = await addDoc(collection(db, "users"), {
+      email: email,
+      lastModified: serverTimestamp(),
+      ...otherAttributes,
+    });
+
+    const newUserDoc = await getDoc(newUserRef);
+    const newUser = newUserDoc.data();
+
+    await sendWelcomeEmail(email);
+
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** CREATE new user --> send email */
+async function sendWelcomeEmail(userEmail: string) {
+  const from: string = process.env.MAIL_USERNAME
+    ? process.env.MAIL_USERNAME
+    : "";
+  const to: string = userEmail;
+  const subject: string = "Welcome to StaffScore!";
+  const mailTemplate: string = `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to StaffScore</title>
+      </head>
+      <body>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h1>Welcome to StaffScore!</h1>
+              <p>We are excited to have you on board!</p>
+              <p>If you have any questions or need assistance, feel free to contact us.</p>
+              <p>Thank you!</p>
+
+              <a href="https://staff-score-frontend.vercel.app/" style="display: inline-block; background-color: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 20px;">Go to StaffScore</a>
+          </div>
+      </body>
+      </html>
+      `;
+
+  await sendMail(from, to, subject, mailTemplate);
+}
+
+/** UPDATE user */
+router.put("/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { tags, ...userDataToUpdate } = req.body; // Don't update tags!!
+
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (!userDocSnapshot.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    await updateDoc(userDocRef, {
+      ...userDataToUpdate,
+      lastModified: serverTimestamp(),
+    });
+
+    const updatedUserDocSnapshot = await getDoc(userDocRef);
+    const updatedUserData = updatedUserDocSnapshot.data();
+
+    res.status(200).json(updatedUserData);
+  } catch (error) {
+    console.error("Error updating user:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

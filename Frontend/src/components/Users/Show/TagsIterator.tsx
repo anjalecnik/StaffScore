@@ -24,6 +24,7 @@ export const TagsIterator = () => {
             variant="outlined"
             label={tag.name}
             style={{ backgroundColor: tag.color, border: 0 }}
+            key={tag.id}
           />
         </Box>
       ))}

@@ -9,6 +9,7 @@ import { TeamList } from './components/Teams/List/Teams';
 import { UserList } from './components/Users/List/Users';
 import { TeamShow } from './components/Teams/TeamShow';
 import { UserCreate } from './components/Users/Create/UserCreate';
+import { UserEdit } from './components/Users/Edit/UserEdit';
 import { UserShow } from './components/Users/Show/UserShow';
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
           list={UserList}
           show={UserShow}
           create={UserCreate}
+          edit={UserEdit}
           recordRepresentation="name"
           icon={UserIcon}
         />
