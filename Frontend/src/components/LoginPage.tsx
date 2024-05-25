@@ -1,11 +1,13 @@
-import { Login } from 'react-admin';
+import { Login, useNotify } from 'react-admin';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from './../config/firebase';
 import { useNavigate } from 'react-router-dom';
 import './../assets/auth.css';
+import { Alert } from '@mui/material';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const notify = useNotify();
 
   const signInWithGoogle = async () => {
     try {
@@ -21,19 +23,39 @@ export const LoginPage = () => {
         });
 
         if (response.ok) {
+          notify(<Alert severity="success">Welcome back!</Alert>, { autoHideDuration: 3000 });
+
           const { userData, userId } = await response.json();
           localStorage.setItem('username', userData); //TODO: handle logged user with state
           localStorage.setItem('userId', userId);
 
           navigate('/');
         } else {
-          console.log('No user found with the email:', result.user.email);
+          notify(
+            <Alert severity="error">
+              Your Google account is not authorized to access this application. Please ensure that
+              you are using the correct account or contact support for further assistance.
+            </Alert>,
+            { autoHideDuration: 5000 }
+          );
         }
       } catch (error) {
-        console.error('Error getting user by email:', error);
+        notify(
+          <Alert severity="warning">
+            An error occurred while trying to authenticate your account. Please try again. If the
+            problem persists, contact support for assistance.
+          </Alert>,
+          { autoHideDuration: 5000 }
+        );
       }
     } catch (err) {
-      console.error(err);
+      notify(
+        <Alert severity="error">
+          Your Google account is not authorized to access this application. Please ensure that you
+          are using the correct account or contact support for further assistance.
+        </Alert>,
+        { autoHideDuration: 5000 }
+      );
     }
   };
 
