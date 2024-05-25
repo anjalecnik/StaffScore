@@ -7,10 +7,13 @@ import {
   orderBy,
   limit,
   startAt,
-  OrderByDirection,
   addDoc,
+  serverTimestamp,
+  where,
 } from "firebase/firestore";
+import { sendMail } from "../config/mailService";
 
+const axios = require("axios");
 const router = Router();
 
 router.get("/", async (req, res) => {
@@ -47,14 +50,53 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  const { email } = req.body;
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
 
   try {
-    await addDoc(collection(db, "users"), {
-      email: email,
-    });
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("__name__", "==", id));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+
+      if (userData.tags && Array.isArray(userData.tags)) {
+        const tagPromises = userData.tags.map((tagRef) => {
+          const tagId = tagRef.id.trim();
+          return axios
+            .get(`https://staff-score.vercel.app/api/tags/${tagId}`)
+            .then((response: { data: any }) => response.data)
+            .catch((error: any) => {
+              console.error(`Error fetching tag with id: ${tagId}`, error);
+              throw new Error(`Error fetching tag with id: ${tagId}`);
+            });
+        });
+
+        const tagsArray = await Promise.all(tagPromises);
+
+        userData.tags = tagsArray;
+
+        const formattedUser = {
+          id: userDoc.id,
+          ...userData,
+        };
+
+        res.json(formattedUser);
+      } else {
+        const formattedUser = {
+          id: userDoc.id,
+          ...userData,
+        };
+
+        res.json(formattedUser);
+      }
+    } else {
+      res.status(404).json({ message: "No user found with the id: " + id });
+    }
   } catch (error) {
+    console.error("Error getting user by id:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
