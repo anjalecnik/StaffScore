@@ -2,24 +2,23 @@ import { useRecordContext } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { IUser } from '../../../types/IUser';
 import { useEffect, useState } from 'react';
-import { dataProvider } from '../../../dataProvider';
 import { ITeam } from '../../../types/ITeam';
 
 export const TeamsIterator = () => {
   const record = useRecordContext<IUser>();
-  const [teams, setTeams] = useState<ITeam[]>([]);
+  const [teams] = useState<ITeam[]>([]);
 
   useEffect(() => {
-    const fetchTeams = async () => {
-      try {
-        if (record.id) {
-          const response = await dataProvider.get(`/api/teams/get-user-teams/${record.id}`);
-          setTeams(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching teams:', error);
-      }
-    };
+    // const fetchTeams = async () => {
+    //   try {
+    //     if (record.id) {
+    //       const response = await dataProvider.get(`/api/teams/get-user-teams/${record.id}`);
+    //       setTeams(response.data);
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching teams:', error);
+    //   }
+    // };
 
     if (record.id) {
       //fetchTeams();

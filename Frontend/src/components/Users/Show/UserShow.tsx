@@ -21,7 +21,7 @@ const UserShowContent = () => {
   const { record } = useShowContext<IUser>();
   if (!record) return null;
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
