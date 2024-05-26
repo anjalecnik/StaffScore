@@ -2,12 +2,15 @@ import { Admin, Resource, ShowGuesser } from 'react-admin';
 import { dataProvider } from './dataProvider';
 import UserIcon from '@mui/icons-material/Group';
 import GroupsIcon from '@mui/icons-material/Groups';
+import PollIcon from '@mui/icons-material/Poll';
 import { Dashboard } from './components/Dashboard';
 import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
 import { TeamList } from './components/Teams/List/Teams';
 import { UserList } from './components/Users/List/Users';
+import { SurveyList } from './components/Surveys/List/Surveys';
 import { TeamShow } from './components/Teams/TeamShow';
+import { SurveyShow } from './components/Surveys/SurveyShow';
 import { UserCreate } from './components/Users/Create/UserCreate';
 
 export default function App() {
@@ -33,6 +36,13 @@ export default function App() {
           show={TeamShow}
           recordRepresentation="name"
           icon={GroupsIcon}
+        />
+        <Resource
+          name="surveys"
+          list={SurveyList}
+          show={SurveyShow}
+          recordRepresentation="name"
+          icon={PollIcon}
         />
       </Admin>
     </>
