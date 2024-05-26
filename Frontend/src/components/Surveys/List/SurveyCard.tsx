@@ -48,7 +48,7 @@ export const SurveyCard = (props: { record?: ISurvey }) => {
             <AssessmentIcon />
           </Avatar>
           <Box textAlign="center" marginTop={3}>
-            <Typography variant="subtitle1">{record.id}</Typography>
+            <Typography variant="subtitle1">{record.name}</Typography>
           </Box>
         </Box>
       </Paper>

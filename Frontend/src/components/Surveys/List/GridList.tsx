@@ -1,27 +1,45 @@
-import { Box, Paper } from '@mui/material';
-import { RecordContextProvider, useListContext } from 'react-admin';
+import { Box, Typography, Paper, ButtonBase } from '@mui/material';
+import { RecordContextProvider, useListContext, useRedirect } from 'react-admin';
 import { ISurvey } from '../../../types/ISurvey';
 import { SurveyCard } from './SurveyCard'; 
+import AddIcon from '@mui/icons-material/Add';
 
 const LoadingGridList = () => (
-  <Box display="flex" flexWrap="wrap" width={1008} gap={1}>
+  <Box display="flex" flexWrap="wrap" width="100%" gap={1}>
     {Array.from({ length: 15 }, (_, key) => (
-      <Paper
-        sx={{
-          height: 200,
-          width: 194,
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: 'grey[200]'
-        }}
-        key={key}
-      />
+      <SurveyCardPlaceholder key={key} />
     ))}
   </Box>
 );
 
+const SurveyCardPlaceholder = () => {
+  const redirect = useRedirect();
+
+  return (
+    <Paper
+      component={ButtonBase}
+      onClick={() => redirect('/surveys/create')}
+      sx={{
+        height: 170,
+        width: 200,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        boxSizing: 'border-box',
+        bgcolor: 'grey.200',
+      }}
+    >
+      <AddIcon sx={{ fontSize: 42 }} />
+      <Typography variant="subtitle2" align="center">Add New Survey</Typography>
+    </Paper>
+  );
+};
+
 const LoadedGridList = () => {
   const { data, isLoading } = useListContext<ISurvey>();
+
+  console.log(data);
 
   if (isLoading) return null;
 
@@ -32,6 +50,7 @@ const LoadedGridList = () => {
           <SurveyCard record={survey} />
         </RecordContextProvider>
       ))}
+      <SurveyCardPlaceholder />
     </Box>
   );
 };
