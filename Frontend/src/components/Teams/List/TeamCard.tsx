@@ -49,9 +49,8 @@ export const TeamCard = (props: { record?: ITeam }) => {
               '& img': { objectFit: 'contain' }
             }}
           />
-          <Box textAlign="center" marginTop={1}>
+          <Box textAlign="center" marginTop={2}>
             <Typography variant="subtitle1">{record.name}</Typography>
-            <Typography variant="subtitle2">{record.description}</Typography>
           </Box>
         </Box>
         <Box display="flex" justifyContent="space-around" width="100%">

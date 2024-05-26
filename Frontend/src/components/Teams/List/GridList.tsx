@@ -31,7 +31,13 @@ const LoadedGridList = () => {
   if (isLoading) return null;
 
   return (
-    <Box display="flex" flexWrap="wrap" width="100%" gap={1}>
+    <Box
+      display="flex"
+      flexWrap="wrap"
+      width="100%"
+      gap={1}
+      sx={{ backgroundColor: '#FAFAFB', boxShadow: 'none' }}
+    >
       {data.map(record => (
         <RecordContextProvider key={record.id} value={record}>
           <TeamCard />

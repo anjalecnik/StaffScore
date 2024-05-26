@@ -1,9 +1,23 @@
 import { Router } from "express";
 import { db } from "../config/firebase";
-import { getDocs, collection, query, where } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  query,
+  where,
+  QuerySnapshot,
+  DocumentReference,
+  doc,
+  addDoc,
+  serverTimestamp,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 const router = Router();
 
+/** GET all teams */
 router.get("/", async (_req, res) => {
   try {
     const teamsSnapshot = await getDocs(collection(db, "teams"));
@@ -22,6 +36,7 @@ router.get("/", async (_req, res) => {
   }
 });
 
+/** GET by document id */
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -30,15 +45,163 @@ router.get("/:id", async (req, res) => {
     const q = query(teamsRef, where("__name__", "==", id));
     const querySnapshot = await getDocs(q);
 
-    const team = { id: id, ...querySnapshot };
-
     if (!querySnapshot.empty) {
-      res.json(team);
+      const teamDoc = querySnapshot.docs[0];
+      const teamData = teamDoc.data();
+
+      const formattedTeam: {
+        id: string;
+        teamLeader_id?: string;
+        members_ids?: string[];
+        [key: string]: any;
+      } = {
+        id: teamDoc.id,
+        ...teamData,
+      };
+
+      if (teamData.teamLeader) {
+        formattedTeam.teamLeader_id = teamData.teamLeader.id.trim();
+      }
+
+      if (teamData.members && Array.isArray(teamData.members)) {
+        formattedTeam.members_ids = teamData.members.map((member: any) =>
+          member.id.trim()
+        );
+      }
+
+      res.json(formattedTeam);
     } else {
       res.status(404).json({ message: "No team found with the id: " + id });
     }
   } catch (error) {
-    console.error("Error getting user by email:", error);
+    console.error("Error getting team by id:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** TODO: GET teams user is a member of */
+router.get("/get-user-teams/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const usersRef = collection(db, "users");
+    const qu = query(usersRef, where("__name__", "==", id));
+    const userQuerySnapshot = await getDocs(qu);
+
+    userQuerySnapshot.forEach((userSnapshot) => {
+      const userRef = userSnapshot.ref;
+      const teamsRef = collection(db, "teams");
+      const userPath = userRef.path; // Get the path of the user document
+      const userDocRef = doc(db, userPath);
+
+      const q = query(teamsRef, where("members", "array-contains", userRef));
+    });
+
+    const teamsRef = collection(db, "teams");
+
+    const q = query(
+      teamsRef,
+      where("members", "array-contains", userQuerySnapshot)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const userTeams = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    if (!querySnapshot.empty) {
+      res.json(userTeams);
+    } else {
+      res
+        .status(404)
+        .json({ message: "No teams found for the user with the id: " + id });
+    }
+  } catch (error) {
+    console.error("Error getting user teams:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** CREATE new team */
+router.post("/", async (req, res) => {
+  const { teamLeader_id, members_ids, ...otherAttributes } = req.body;
+
+  try {
+    const newTeamRef = await addDoc(collection(db, "teams"), {
+      teamLeader: doc(db, "users", teamLeader_id),
+      members: members_ids.map((id: string) => doc(db, "users", id)),
+      lastModified: serverTimestamp(),
+      ...otherAttributes,
+    });
+
+    const newTeamDoc = await getDoc(newTeamRef);
+    const newTeam = newTeamDoc.data();
+
+    res.status(201).json(newTeam);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** UPDATE team */
+router.put("/:teamId", async (req, res) => {
+  const { teamId } = req.params;
+  const { name, description, teamLeader_id, members_ids } = req.body;
+
+  try {
+    const teamDocRef = doc(db, "teams", teamId);
+    const teamDocSnapshot = await getDoc(teamDocRef);
+
+    if (!teamDocSnapshot.exists()) {
+      return res.status(404).json({ error: "Team not found" });
+    }
+
+    const updateData: { [key: string]: any } = {
+      lastModified: serverTimestamp(),
+    };
+
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (teamLeader_id !== undefined)
+      updateData.teamLeader = doc(db, "users", teamLeader_id);
+    if (members_ids !== undefined)
+      updateData.members = members_ids.map((id: string) =>
+        doc(db, "users", id)
+      );
+
+    await updateDoc(teamDocRef, updateData);
+
+    const updatedTeamDocSnapshot = await getDoc(teamDocRef);
+    let updatedTeamData = updatedTeamDocSnapshot.data();
+
+    if (updatedTeamData) updatedTeamData.id = teamId;
+
+    return res.status(200).json(updatedTeamData);
+  } catch (error) {
+    console.error("Error updating team:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** DELETE team */
+router.delete("/:teamId", async (req, res) => {
+  const { teamId } = req.params;
+
+  try {
+    const teamDocRef = doc(db, "teams", teamId);
+    const teamDocSnapshot = await getDoc(teamDocRef);
+
+    if (!teamDocSnapshot.exists()) {
+      return res.status(404).json({ error: "Team not found" });
+    }
+
+    await deleteDoc(teamDocRef);
+
+    res.status(200).json();
+  } catch (error) {
+    console.error("Error deleting team:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
