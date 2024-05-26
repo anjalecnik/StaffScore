@@ -7,10 +7,12 @@ import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
 import { TeamList } from './components/Teams/List/Teams';
 import { UserList } from './components/Users/List/Users';
-import { TeamShow } from './components/Teams/TeamShow';
+import { TeamShow } from './components/Teams/Show/TeamShow';
 import { UserCreate } from './components/Users/Create/UserCreate';
 import { UserEdit } from './components/Users/Edit/UserEdit';
 import { UserShow } from './components/Users/Show/UserShow';
+import { TeamCreate } from './components/Teams/Create/TeamCreate';
+import { TeamEdit } from './components/Teams/Edit/TeamEdit';
 
 export default function App() {
   return (
@@ -35,6 +37,8 @@ export default function App() {
           name="teams"
           list={TeamList}
           show={TeamShow}
+          create={TeamCreate}
+          edit={TeamEdit}
           recordRepresentation="displayName"
           icon={GroupsIcon}
         />
