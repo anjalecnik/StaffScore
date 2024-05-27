@@ -17,7 +17,6 @@ import {
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
 
-const axios = require("axios");
 const router = Router();
 
 /** GET all users */
@@ -55,6 +54,11 @@ router.get("/", async (req, res) => {
   }
 });
 
+interface ITag {
+  name: string;
+  color: string;
+}
+
 /** GET by document id */
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -69,18 +73,23 @@ router.get("/:id", async (req, res) => {
       const userData = userDoc.data();
 
       if (userData.tags && Array.isArray(userData.tags)) {
-        const tagPromises = userData.tags.map((tagRef) => {
-          const tagId = tagRef.id.trim();
-          return axios
-            .get(`https://staff-score.vercel.app/api/tags/${tagId}`)
-            .then((response: { data: any }) => response.data)
-            .catch((error: any) => {
-              console.error(`Error fetching tag with id: ${tagId}`, error);
-              throw new Error(`Error fetching tag with id: ${tagId}`);
-            });
+        const tagPromises = userData.tags.map(async (tagRef) => {
+          const trimmedTagId = tagRef.id.trim(); // Trim any leading or trailing spaces from the tag ID
+          const trimmedTagRef = doc(db, "tags", trimmedTagId);
+
+          const tagSnap = await getDoc(trimmedTagRef);
+          if (tagSnap.exists()) {
+            const tagData = tagSnap.data() as ITag;
+            return { id: tagSnap.id, ...tagData };
+          } else {
+            console.log(`No tag found with the id: ${tagRef.id}`);
+            return null;
+          }
         });
 
-        const tagsArray = await Promise.all(tagPromises);
+        const tagsArray = (await Promise.all(tagPromises)).filter(
+          (tag) => tag !== null
+        );
 
         userData.tags = tagsArray;
 
@@ -106,7 +115,6 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 /** CREATE new user */
 router.post("/", async (req, res) => {
   const { email, ...otherAttributes } = req.body;
