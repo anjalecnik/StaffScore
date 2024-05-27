@@ -1,4 +1,4 @@
-import { Admin, Resource, ShowGuesser } from 'react-admin';
+import { Admin, Resource } from 'react-admin';
 import { dataProvider } from './dataProvider';
 import UserIcon from '@mui/icons-material/Group';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -8,15 +8,21 @@ import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
 import { TeamList } from './components/Teams/List/Teams';
 import { UserList } from './components/Users/List/Users';
+import { TeamShow } from './components/Teams/Show/TeamShow';
 import { SurveyList } from './components/Surveys/List/Surveys';
 import { TeamShow } from './components/Teams/TeamShow';
 import { SurveyShow } from './components/Surveys/SurveyShow';
 import { UserCreate } from './components/Users/Create/UserCreate';
+import { UserEdit } from './components/Users/Edit/UserEdit';
+import { UserShow } from './components/Users/Show/UserShow';
+import { TeamCreate } from './components/Teams/Create/TeamCreate';
+import { TeamEdit } from './components/Teams/Edit/TeamEdit';
 
 export default function App() {
   return (
     <>
       <Admin
+        title="StaffScore"
         authProvider={authProvider}
         dataProvider={dataProvider}
         dashboard={Dashboard}
@@ -25,8 +31,9 @@ export default function App() {
         <Resource
           name="users"
           list={UserList}
-          show={ShowGuesser}
+          show={UserShow}
           create={UserCreate}
+          edit={UserEdit}
           recordRepresentation="name"
           icon={UserIcon}
         />
@@ -34,7 +41,9 @@ export default function App() {
           name="teams"
           list={TeamList}
           show={TeamShow}
-          recordRepresentation="name"
+          create={TeamCreate}
+          edit={TeamEdit}
+          recordRepresentation="displayName"
           icon={GroupsIcon}
         />
         <Resource
@@ -48,5 +57,3 @@ export default function App() {
     </>
   );
 }
-
-0;
