@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, Button, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { useNotify } from 'react-admin';
 
-const QuestionForm = ({ open, onClose, onQuestionCreated }) => {
+const QuestionForm = ({ open, onClose, onQuestionCreated } : any) => {
   const [question, setQuestion] = useState('');
   const [type, setType] = useState('');
   const notify = useNotify();
@@ -31,7 +31,7 @@ const QuestionForm = ({ open, onClose, onQuestionCreated }) => {
       } else {
         notify('Failed to create question',);
       }
-    } catch (error) {
+    } catch (error : any) {
       notify(`Error: ${error.message}`)
     }
   };
