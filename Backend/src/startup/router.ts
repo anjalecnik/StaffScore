@@ -4,6 +4,7 @@ import teamsRouter from "../routes/teams";
 import usersRouter from "../routes/users";
 import tagsRouter from "../routes/tags";
 import surveysRouter from "../routes/surveys"
+import questionsRouter from "../routes/questions"
 
 const routerSetup = (app: Express) => {
   app.get("/", async (req: Request, res: Response) => {
@@ -15,5 +16,6 @@ const routerSetup = (app: Express) => {
   app.use("/api/users", usersRouter);
   app.use("/api/tags", tagsRouter);
   app.use("/api/surveys", surveysRouter);
+  app.use("/api/questions", questionsRouter)
 };
 export default routerSetup;
