@@ -1,9 +1,15 @@
-import { useShowController, Title } from 'react-admin';
+import { ShowBase, useShowContext, Title, EditButton } from 'react-admin';
 import { Card, CardContent, Container, Divider, Typography, Box, Slider, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel } from '@mui/material';
 import { ISurvey } from '../../types/ISurvey';
 
-export const SurveyShow = () => {
-  const { record } = useShowController<ISurvey>();
+export const SurveyShow = () => (
+  <ShowBase>
+    <SurveyShowContent />
+  </ShowBase>
+);
+
+const SurveyShowContent = () => {
+  const { record } = useShowContext<ISurvey>();
 
   console.log("Survey Record:", record);
 
@@ -17,6 +23,9 @@ export const SurveyShow = () => {
           <Typography variant="h5" gutterBottom>
             {record.name}
           </Typography>
+          <Box>
+            <EditButton label="Edit Survey" />
+          </Box>
           <Divider />
           <Box mt={3}>
             {record.questions.map((question, index) => (

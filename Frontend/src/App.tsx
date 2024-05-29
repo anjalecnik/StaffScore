@@ -10,13 +10,14 @@ import { TeamList } from './components/Teams/List/Teams';
 import { UserList } from './components/Users/List/Users';
 import { TeamShow } from './components/Teams/Show/TeamShow';
 import { SurveyList } from './components/Surveys/List/Surveys';
-import { TeamShow } from './components/Teams/TeamShow';
 import { SurveyShow } from './components/Surveys/SurveyShow';
 import { UserCreate } from './components/Users/Create/UserCreate';
 import { UserEdit } from './components/Users/Edit/UserEdit';
 import { UserShow } from './components/Users/Show/UserShow';
 import { TeamCreate } from './components/Teams/Create/TeamCreate';
 import { TeamEdit } from './components/Teams/Edit/TeamEdit';
+import { SurveyCreate } from './components/Surveys/Create/SurveyCreate';
+import { SurveyEdit } from './components/Surveys/Edit/SurveyEdit';
 
 export default function App() {
   return (
@@ -50,6 +51,8 @@ export default function App() {
           name="surveys"
           list={SurveyList}
           show={SurveyShow}
+          create={SurveyCreate}
+          edit={SurveyEdit}
           recordRepresentation="name"
           icon={PollIcon}
         />
