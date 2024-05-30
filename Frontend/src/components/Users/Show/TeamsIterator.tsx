@@ -1,31 +1,14 @@
-import { useRecordContext } from 'react-admin';
+import { useCreatePath, useRecordContext } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { IUser } from '../../../types/IUser';
-import { useEffect, useState } from 'react';
-import { ITeam } from '../../../types/ITeam';
+import { Link as MuiLink } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 export const TeamsIterator = () => {
   const record = useRecordContext<IUser>();
-  const [teams] = useState<ITeam[]>([]);
+  const createPath = useCreatePath();
 
-  useEffect(() => {
-    // const fetchTeams = async () => {
-    //   try {
-    //     if (record.id) {
-    //       const response = await dataProvider.get(`/api/teams/get-user-teams/${record.id}`);
-    //       setTeams(response.data);
-    //     }
-    //   } catch (error) {
-    //     console.error('Error fetching teams:', error);
-    //   }
-    // };
-
-    if (record.id) {
-      //fetchTeams();
-    }
-  }, [record]);
-
-  if (!teams || teams.length === 0) {
+  if (!record.teams || record.teams.length === 0) {
     return (
       <Box>
         <Typography component="span" variant="body2" color="textSecondary">
@@ -37,9 +20,20 @@ export const TeamsIterator = () => {
 
   return (
     <>
-      {teams?.map(team => (
+      {record.teams?.map(team => (
         <Box mt={1} mb={1} key={team.id}>
-          <Typography key={team.id}>{team.name}</Typography>
+          <MuiLink
+            component={Link}
+            to={createPath({
+              resource: 'teams',
+              id: team.id,
+              type: 'show'
+            })}
+            color="inherit"
+            underline="hover"
+          >
+            <Typography key={team.id}>{team.name}</Typography>
+          </MuiLink>
         </Box>
       ))}
     </>

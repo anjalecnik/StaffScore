@@ -26,8 +26,10 @@ router.get("/", async (req, res) => {
       parseInt(_limit as string, 10) * parseInt(_page as string, 10) || 10;
     let start =
       (parseInt(_page as string, 10) - 1) * parseInt(_limit as string, 10) || 0;
-    const order = (_order as string) === "DESC" ? "asc" : "asc"; // TODO: enable filtering by desc (https://www.reddit.com/r/Firebase/comments/16p5a4d/pagination_with_sorting_and_filtering/)
+    const order = (_order as string) === "DESC" ? "desc" : "asc";
     let sortField = typeof _sort === "string" ? _sort : "lastModified";
+
+    if (sortField === "id") sortField = "lastModified";
 
     if (parseInt(_page as string, 10) == 1) {
       start = 0;
@@ -37,12 +39,17 @@ router.get("/", async (req, res) => {
       query(collection(db, "users"), orderBy(sortField, order))
     );
 
-    const formattedUsers = usersSnapshot.docs.map((doc) => ({
+    let formattedUsers = usersSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    const filteredUsers = formattedUsers.slice(start, end);
+    const ascDescUsers =
+      order === "desc"
+        ? formattedUsers.sort((one, two) => (one > two ? -1 : 1))
+        : formattedUsers;
+
+    const filteredUsers = ascDescUsers.slice(start, end);
 
     const totalRecords = usersSnapshot.size;
 
@@ -97,17 +104,71 @@ router.get("/:id", async (req, res) => {
 
         userData.tags = tagsArray;
 
-        const formattedUser = {
+        let formattedUser = {
           id: userDoc.id,
           ...userData,
         };
 
+        if (userData.teams && Array.isArray(userData.teams)) {
+          const teamPromises = userData.teams.map(async (teamRef) => {
+            const trimmedTeamId = teamRef.id.trim();
+            const trimmedTeamRef = doc(db, "teams", trimmedTeamId);
+
+            const teamSnap = await getDoc(trimmedTeamRef);
+            if (teamSnap.exists()) {
+              const teamData = teamSnap.data() as ITag;
+              return { id: teamSnap.id, ...teamData };
+            } else {
+              console.log(`No team found with the id: ${teamRef.id}`);
+              return null;
+            }
+          });
+
+          const teamsArray = (await Promise.all(teamPromises)).filter(
+            (team) => team !== null
+          );
+
+          userData.teams = teamsArray;
+
+          formattedUser = {
+            id: userDoc.id,
+            ...userData,
+          };
+        }
+
         res.json(formattedUser);
       } else {
-        const formattedUser = {
+        let formattedUser = {
           id: userDoc.id,
           ...userData,
         };
+
+        if (userData.teams && Array.isArray(userData.teams)) {
+          const teamPromises = userData.teams.map(async (teamRef) => {
+            const trimmedTeamId = teamRef.id.trim();
+            const trimmedTeamRef = doc(db, "teams", trimmedTeamId);
+
+            const teamSnap = await getDoc(trimmedTeamRef);
+            if (teamSnap.exists()) {
+              const teamData = teamSnap.data() as ITag;
+              return { id: teamSnap.id, ...teamData };
+            } else {
+              console.log(`No team found with the id: ${teamRef.id}`);
+              return null;
+            }
+          });
+
+          const teamsArray = (await Promise.all(teamPromises)).filter(
+            (team) => team !== null
+          );
+
+          userData.teams = teamsArray;
+
+          formattedUser = {
+            id: userDoc.id,
+            ...userData,
+          };
+        }
 
         res.json(formattedUser);
       }

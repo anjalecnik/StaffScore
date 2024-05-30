@@ -11,25 +11,39 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
+  arrayUnion,
+  orderBy,
 } from "firebase/firestore";
 
 const router = Router();
 
 /** GET all teams */
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const teamsSnapshot = await getDocs(collection(db, "teams"));
+    const { _sort, _order } = req.query;
+
+    const order = (_order as string) === "DESC" ? "desc" : "asc";
+    let sortField = typeof _sort === "string" ? _sort : "lastModified";
+
+    if (sortField === "id") sortField = "lastModified";
+
+    const teamsSnapshot = await getDocs(
+      query(collection(db, "teams"), orderBy(sortField, order))
+    );
     const teams = teamsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    res.setHeader("X-Total-Count", teams.length.toString());
+    const ascDescTeams =
+      order === "desc" ? teams.sort((one, two) => (one > two ? -1 : 1)) : teams;
+
+    res.setHeader("X-Total-Count", ascDescTeams.length.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
 
     res.json({
-      data: teams,
-      total: teams.length,
+      data: ascDescTeams,
+      total: ascDescTeams.length,
     });
   } catch (error) {
     console.error("Error getting teams", error);
@@ -130,51 +144,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-/** TODO: GET teams user is a member of */
-router.get("/get-user-teams/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const usersRef = collection(db, "users");
-    const qu = query(usersRef, where("__name__", "==", id));
-    const userQuerySnapshot = await getDocs(qu);
-
-    userQuerySnapshot.forEach((userSnapshot) => {
-      const userRef = userSnapshot.ref;
-      const teamsRef = collection(db, "teams");
-      const userPath = userRef.path; // Get the path of the user document
-      const userDocRef = doc(db, userPath);
-
-      const q = query(teamsRef, where("members", "array-contains", userRef));
-    });
-
-    const teamsRef = collection(db, "teams");
-
-    const q = query(
-      teamsRef,
-      where("members", "array-contains", userQuerySnapshot)
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    const userTeams = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    if (!querySnapshot.empty) {
-      res.json(userTeams);
-    } else {
-      res
-        .status(404)
-        .json({ message: "No teams found for the user with the id: " + id });
-    }
-  } catch (error) {
-    console.error("Error getting user teams:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 /** CREATE new team */
 router.post("/", async (req, res) => {
   const { teamLeader_id, members_ids, ...otherAttributes } = req.body;
@@ -186,6 +155,15 @@ router.post("/", async (req, res) => {
       lastModified: serverTimestamp(),
       ...otherAttributes,
     });
+
+    const updatePromises = members_ids.map(async (id: string) => {
+      const userRef = doc(db, "users", id);
+      await updateDoc(userRef, {
+        teams: arrayUnion(newTeamRef),
+      });
+    });
+
+    await Promise.all(updatePromises);
 
     const newTeamDoc = await getDoc(newTeamRef);
     const newTeam = newTeamDoc.data();
@@ -223,6 +201,15 @@ router.put("/:teamId", async (req, res) => {
       );
 
     await updateDoc(teamDocRef, updateData);
+
+    const updatePromises = members_ids.map(async (id: string) => {
+      const userRef = doc(db, "users", id);
+      await updateDoc(userRef, {
+        teams: arrayUnion(teamDocRef),
+      });
+    });
+
+    await Promise.all(updatePromises);
 
     const updatedTeamDocSnapshot = await getDoc(teamDocRef);
     let updatedTeamData = updatedTeamDocSnapshot.data();

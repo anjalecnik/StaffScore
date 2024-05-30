@@ -8,7 +8,7 @@ import {
   Datagrid,
   SearchInput
 } from 'react-admin';
-import UserIcon from '@mui/icons-material/Group';
+import SellIcon from '@mui/icons-material/Sell';
 import { CustomChip } from './CustomChip';
 
 export const TagList = () => {
@@ -16,7 +16,7 @@ export const TagList = () => {
     <RaList filters={tagFilters} actions={<TagListActions />}>
       <Box display="flex" alignItems="center">
         <Box ml={2} mr={2} display="flex">
-          <UserIcon color="disabled" fontSize="large" />
+          <SellIcon color="disabled" fontSize="large" />
         </Box>
         <Link underline="none" variant="h5" color="textSecondary">
           <h5>Tags</h5>
