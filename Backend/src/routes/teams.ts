@@ -12,25 +12,38 @@ import {
   updateDoc,
   deleteDoc,
   arrayUnion,
+  orderBy,
 } from "firebase/firestore";
 
 const router = Router();
 
 /** GET all teams */
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const teamsSnapshot = await getDocs(collection(db, "teams"));
+    const { _sort, _order } = req.query;
+
+    const order = (_order as string) === "DESC" ? "desc" : "asc";
+    let sortField = typeof _sort === "string" ? _sort : "lastModified";
+
+    if (sortField === "id") sortField = "lastModified";
+
+    const teamsSnapshot = await getDocs(
+      query(collection(db, "teams"), orderBy(sortField, order))
+    );
     const teams = teamsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    res.setHeader("X-Total-Count", teams.length.toString());
+    const ascDescTeams =
+      order === "desc" ? teams.sort((one, two) => (one > two ? -1 : 1)) : teams;
+
+    res.setHeader("X-Total-Count", ascDescTeams.length.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
 
     res.json({
-      data: teams,
-      total: teams.length,
+      data: ascDescTeams,
+      total: ascDescTeams.length,
     });
   } catch (error) {
     console.error("Error getting teams", error);

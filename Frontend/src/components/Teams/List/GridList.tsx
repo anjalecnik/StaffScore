@@ -1,6 +1,6 @@
 import { Box, Paper } from '@mui/material';
-import { RecordContextProvider, useListContext } from 'react-admin';
-
+import { Link, RecordContextProvider, useListContext } from 'react-admin';
+import GroupsIcon from '@mui/icons-material/Groups';
 import { TeamCard } from './TeamCard';
 import { ITeam } from '../../../types/ITeam';
 
@@ -29,21 +29,24 @@ const LoadedGridList = () => {
   const { data, isLoading } = useListContext<ITeam>();
 
   if (isLoading) return null;
-
   return (
-    <Box
-      display="flex"
-      flexWrap="wrap"
-      width="100%"
-      gap={1}
-      sx={{ backgroundColor: '#FAFAFB', boxShadow: 'none' }}
-    >
-      {data.map(record => (
-        <RecordContextProvider key={record.id} value={record}>
-          <TeamCard />
-        </RecordContextProvider>
-      ))}
-    </Box>
+    <>
+      <Box display="flex" alignItems="center">
+        <Box ml={2} mr={2} display="flex">
+          <GroupsIcon color="disabled" fontSize="large" />
+        </Box>
+        <Link underline="none" variant="h5" color="textSecondary">
+          <h5>Teams</h5>
+        </Link>
+      </Box>
+      <Box display="flex" flexWrap="wrap" gap={1} sx={{ boxShadow: 'none' }}>
+        {data.map(record => (
+          <RecordContextProvider key={record.id} value={record}>
+            <TeamCard />
+          </RecordContextProvider>
+        ))}
+      </Box>
+    </>
   );
 };
 

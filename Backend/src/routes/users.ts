@@ -29,6 +29,8 @@ router.get("/", async (req, res) => {
     const order = (_order as string) === "DESC" ? "desc" : "asc";
     let sortField = typeof _sort === "string" ? _sort : "lastModified";
 
+    if (sortField === "id") sortField = "lastModified";
+
     if (parseInt(_page as string, 10) == 1) {
       start = 0;
     }
