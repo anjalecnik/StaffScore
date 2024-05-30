@@ -22,7 +22,6 @@ router.get("/", async (req, res) => {
   try {
     const { q } = req.query;
 
-    console.log(q);
     const queryText = (q as string) ? q : "";
 
     const tagsSnapshot = query(

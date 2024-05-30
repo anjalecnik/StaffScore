@@ -2,7 +2,7 @@
 import { stringify } from 'query-string';
 import { fetchUtils, DataProvider } from 'ra-core';
 
-export const API_URL = 'https://staff-score-frontend.vercel.app/api';
+export const API_URL = 'https://staff-score.vercel.app/api';
 
 export const dataProvider: DataProvider = {
   getList: async (resource, params) => {
@@ -28,13 +28,10 @@ export const dataProvider: DataProvider = {
     return { data: response.json };
   },
 
-  getMany: async (resource, params) => {
-    const query = {
-      id: params.ids
-    };
-
-    const response = await fetchUtils.fetchJson(`${API_URL}/${resource}/${stringify(query)}`);
-    return { data: response.json };
+  getMany: async resource => {
+    const response = await fetchUtils.fetchJson(`${API_URL}/${resource}`);
+    const jsonResponse = await response.json;
+    return { data: jsonResponse.data || [] };
   },
 
   getManyReference: async (resource, params) => {
