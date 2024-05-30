@@ -1,5 +1,5 @@
-import { Box, Paper } from '@mui/material';
-import { Link, RecordContextProvider, useListContext } from 'react-admin';
+import { Box, Paper, Link } from '@mui/material';
+import { RecordContextProvider, useListContext } from 'react-admin';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { TeamCard } from './TeamCard';
 import { ITeam } from '../../../types/ITeam';
