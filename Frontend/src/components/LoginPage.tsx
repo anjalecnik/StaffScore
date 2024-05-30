@@ -14,13 +14,16 @@ export const LoginPage = () => {
       const result = await signInWithPopup(auth, googleProvider);
 
       try {
-        const response = await fetch('https://staff-score.vercel.app/api/users/check-user', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email: result.user.email })
-        });
+        const response = await fetch(
+          'https://staff-score-frontend.vercel.app/api/users/check-user',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: result.user.email })
+          }
+        );
 
         if (response.ok) {
           notify(<Alert severity="success">Welcome back!</Alert>, { autoHideDuration: 3000 });

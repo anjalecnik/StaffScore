@@ -5,8 +5,6 @@ import {
   collection,
   query,
   orderBy,
-  limit,
-  startAt,
   addDoc,
   serverTimestamp,
   where,
@@ -22,33 +20,39 @@ const router = Router();
 /** GET all users */
 router.get("/", async (req, res) => {
   try {
-    const { _end, _order, _sort, _start } = req.query;
+    const { _limit, _page, _sort, _order } = req.query;
 
-    const end = parseInt(_end as string, 10) || 10;
-    const start = parseInt(_start as string, 10) || 0;
+    const end =
+      parseInt(_limit as string, 10) * parseInt(_page as string, 10) || 10;
+    let start =
+      (parseInt(_page as string, 10) - 1) * parseInt(_limit as string, 10) || 0;
     const order = (_order as string) === "DESC" ? "asc" : "asc"; // TODO: enable filtering by desc (https://www.reddit.com/r/Firebase/comments/16p5a4d/pagination_with_sorting_and_filtering/)
     let sortField = typeof _sort === "string" ? _sort : "lastModified";
 
-    if (sortField == "id") sortField = "lastModified";
+    if (parseInt(_page as string, 10) == 1) {
+      start = 0;
+    }
 
-    const usersSnapshot = await query(
-      collection(db, "users"),
-      orderBy(sortField, order),
-      startAt(start),
-      limit(end - start)
+    const usersSnapshot = await getDocs(
+      query(collection(db, "users"), orderBy(sortField, order))
     );
 
-    const users = await getDocs(usersSnapshot);
-
-    const formattedUsers = users.docs.map((doc) => ({
+    const formattedUsers = usersSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    res.setHeader("X-Total-Count", formattedUsers.length.toString());
+    const filteredUsers = formattedUsers.slice(start, end);
+
+    const totalRecords = usersSnapshot.size;
+
+    res.setHeader("X-Total-Count", totalRecords.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
 
-    res.json(formattedUsers);
+    res.json({
+      data: filteredUsers,
+      total: totalRecords,
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
@@ -115,6 +119,7 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 /** CREATE new user */
 router.post("/", async (req, res) => {
   const { email, ...otherAttributes } = req.body;
@@ -209,7 +214,7 @@ router.delete("/:userId", async (req, res) => {
 
     await deleteDoc(userDocRef);
 
-    res.status(200).json();
+    res.status(200).json([]);
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "Internal server error" });

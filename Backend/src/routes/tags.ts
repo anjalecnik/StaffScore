@@ -42,7 +42,10 @@ router.get("/", async (req, res) => {
     res.setHeader("X-Total-Count", tags.length.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
 
-    res.json(tags);
+    res.json({
+      data: tags,
+      total: tags.length,
+    });
   } catch (error) {
     console.error("Error getting teams", error);
     res.status(500).json({ error: "Internal server error" });
