@@ -10,6 +10,10 @@ export interface IUser {
   zipcode: string;
   photoUrl: string;
   phoneNumber: string;
+  employmentDate: Date;
+  cardIdentifier: string;
+  timeSpaceIdentifier: string;
+  teamworkIdentifier: string;
   tags: ITag[];
   teams: ITeam[];
 }
