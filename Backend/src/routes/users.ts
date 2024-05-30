@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
       parseInt(_limit as string, 10) * parseInt(_page as string, 10) || 10;
     let start =
       (parseInt(_page as string, 10) - 1) * parseInt(_limit as string, 10) || 0;
-    const order = (_order as string) === "DESC" ? "asc" : "asc"; // TODO: enable filtering by desc (https://www.reddit.com/r/Firebase/comments/16p5a4d/pagination_with_sorting_and_filtering/)
+    const order = (_order as string) === "DESC" ? "desc" : "asc";
     let sortField = typeof _sort === "string" ? _sort : "lastModified";
 
     if (parseInt(_page as string, 10) == 1) {
@@ -37,12 +37,17 @@ router.get("/", async (req, res) => {
       query(collection(db, "users"), orderBy(sortField, order))
     );
 
-    const formattedUsers = usersSnapshot.docs.map((doc) => ({
+    let formattedUsers = usersSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    const filteredUsers = formattedUsers.slice(start, end);
+    const ascDescUsers =
+      order === "desc"
+        ? formattedUsers.sort((one, two) => (one > two ? -1 : 1))
+        : formattedUsers;
+
+    const filteredUsers = ascDescUsers.slice(start, end);
 
     const totalRecords = usersSnapshot.size;
 
