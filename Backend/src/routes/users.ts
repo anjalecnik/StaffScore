@@ -102,17 +102,71 @@ router.get("/:id", async (req, res) => {
 
         userData.tags = tagsArray;
 
-        const formattedUser = {
+        let formattedUser = {
           id: userDoc.id,
           ...userData,
         };
 
+        if (userData.teams && Array.isArray(userData.teams)) {
+          const teamPromises = userData.teams.map(async (teamRef) => {
+            const trimmedTeamId = teamRef.id.trim();
+            const trimmedTeamRef = doc(db, "teams", trimmedTeamId);
+
+            const teamSnap = await getDoc(trimmedTeamRef);
+            if (teamSnap.exists()) {
+              const teamData = teamSnap.data() as ITag;
+              return { id: teamSnap.id, ...teamData };
+            } else {
+              console.log(`No team found with the id: ${teamRef.id}`);
+              return null;
+            }
+          });
+
+          const teamsArray = (await Promise.all(teamPromises)).filter(
+            (team) => team !== null
+          );
+
+          userData.teams = teamsArray;
+
+          formattedUser = {
+            id: userDoc.id,
+            ...userData,
+          };
+        }
+
         res.json(formattedUser);
       } else {
-        const formattedUser = {
+        let formattedUser = {
           id: userDoc.id,
           ...userData,
         };
+
+        if (userData.teams && Array.isArray(userData.teams)) {
+          const teamPromises = userData.teams.map(async (teamRef) => {
+            const trimmedTeamId = teamRef.id.trim();
+            const trimmedTeamRef = doc(db, "teams", trimmedTeamId);
+
+            const teamSnap = await getDoc(trimmedTeamRef);
+            if (teamSnap.exists()) {
+              const teamData = teamSnap.data() as ITag;
+              return { id: teamSnap.id, ...teamData };
+            } else {
+              console.log(`No team found with the id: ${teamRef.id}`);
+              return null;
+            }
+          });
+
+          const teamsArray = (await Promise.all(teamPromises)).filter(
+            (team) => team !== null
+          );
+
+          userData.teams = teamsArray;
+
+          formattedUser = {
+            id: userDoc.id,
+            ...userData,
+          };
+        }
 
         res.json(formattedUser);
       }

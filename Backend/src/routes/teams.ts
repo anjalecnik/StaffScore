@@ -11,6 +11,7 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
+  arrayUnion,
 } from "firebase/firestore";
 
 const router = Router();
@@ -130,51 +131,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-/** TODO: GET teams user is a member of */
-router.get("/get-user-teams/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const usersRef = collection(db, "users");
-    const qu = query(usersRef, where("__name__", "==", id));
-    const userQuerySnapshot = await getDocs(qu);
-
-    userQuerySnapshot.forEach((userSnapshot) => {
-      const userRef = userSnapshot.ref;
-      const teamsRef = collection(db, "teams");
-      const userPath = userRef.path; // Get the path of the user document
-      const userDocRef = doc(db, userPath);
-
-      const q = query(teamsRef, where("members", "array-contains", userRef));
-    });
-
-    const teamsRef = collection(db, "teams");
-
-    const q = query(
-      teamsRef,
-      where("members", "array-contains", userQuerySnapshot)
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    const userTeams = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    if (!querySnapshot.empty) {
-      res.json(userTeams);
-    } else {
-      res
-        .status(404)
-        .json({ message: "No teams found for the user with the id: " + id });
-    }
-  } catch (error) {
-    console.error("Error getting user teams:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 /** CREATE new team */
 router.post("/", async (req, res) => {
   const { teamLeader_id, members_ids, ...otherAttributes } = req.body;
@@ -186,6 +142,15 @@ router.post("/", async (req, res) => {
       lastModified: serverTimestamp(),
       ...otherAttributes,
     });
+
+    const updatePromises = members_ids.map(async (id: string) => {
+      const userRef = doc(db, "users", id);
+      await updateDoc(userRef, {
+        teams: arrayUnion(newTeamRef),
+      });
+    });
+
+    await Promise.all(updatePromises);
 
     const newTeamDoc = await getDoc(newTeamRef);
     const newTeam = newTeamDoc.data();
@@ -223,6 +188,15 @@ router.put("/:teamId", async (req, res) => {
       );
 
     await updateDoc(teamDocRef, updateData);
+
+    const updatePromises = members_ids.map(async (id: string) => {
+      const userRef = doc(db, "users", id);
+      await updateDoc(userRef, {
+        teams: arrayUnion(teamDocRef),
+      });
+    });
+
+    await Promise.all(updatePromises);
 
     const updatedTeamDocSnapshot = await getDoc(teamDocRef);
     let updatedTeamData = updatedTeamDocSnapshot.data();

@@ -1,4 +1,5 @@
 import { ITag } from './ITag';
+import { ITeam } from './ITeam';
 
 export interface IUser {
   id: string;
@@ -10,4 +11,5 @@ export interface IUser {
   photoUrl: string;
   phoneNumber: string;
   tags: ITag[];
+  teams: ITeam[];
 }
