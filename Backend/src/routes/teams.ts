@@ -17,6 +17,7 @@ import {
   endAt,
   QuerySnapshot,
   DocumentData,
+  Query,
 } from "firebase/firestore";
 
 const router = Router();
@@ -32,30 +33,24 @@ router.get("/", async (req, res) => {
 
     if (sortField === "id") sortField = "lastModified";
 
-    console.log(order, sortField, queryText);
-
-    let teamsSnapshot: QuerySnapshot<DocumentData, DocumentData>;
+    let qu: Query<DocumentData, DocumentData>;
     if (queryText === "") {
-      teamsSnapshot = await getDocs(
-        query(collection(db, "teams"), orderBy(sortField))
-      );
+      qu = query(collection(db, "teams"), orderBy(sortField));
     } else {
-      teamsSnapshot = await getDocs(
-        query(
-          collection(db, "teams"),
-          orderBy(sortField),
-          startAt(queryText),
-          endAt(queryText + "\uf8ff")
-        )
+      qu = query(
+        collection(db, "teams"),
+        orderBy(sortField),
+        startAt(queryText),
+        endAt(queryText + "\uf8ff")
       );
     }
+
+    const teamsSnapshot = await getDocs(qu);
 
     const teams = teamsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
-    console.log(teams);
 
     const ascDescTeams = order === "desc" ? teams.reverse() : teams;
 
