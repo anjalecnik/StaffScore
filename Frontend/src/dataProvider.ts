@@ -9,9 +9,17 @@ export const dataProvider: DataProvider = {
     const { page, perPage } = params.pagination;
     const { field, order } = params.sort;
 
-    const response = await fetchUtils.fetchJson(
-      `${API_URL}/${resource}?_page=${page}&_limit=${perPage}&_sort=${field}&_order=${order}`
-    );
+    const { q } = params.filter;
+
+    let response: any;
+    if (q)
+      response = await fetchUtils.fetchJson(
+        `${API_URL}/${resource}?_page=${page}&_limit=${perPage}&_sort=${field}&_order=${order}&q=${q}`
+      );
+    else
+      response = await fetchUtils.fetchJson(
+        `${API_URL}/${resource}?_page=${page}&_limit=${perPage}&_sort=${field}&_order=${order}`
+      );
 
     const jsonResponse = await response.json;
 
