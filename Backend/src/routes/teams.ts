@@ -15,6 +15,8 @@ import {
   orderBy,
   startAt,
   endAt,
+  QuerySnapshot,
+  DocumentData,
 } from "firebase/firestore";
 
 const router = Router();
@@ -30,18 +32,30 @@ router.get("/", async (req, res) => {
 
     if (sortField === "id") sortField = "lastModified";
 
-    const teamsSnapshot = await getDocs(
-      query(
-        collection(db, "teams"),
-        orderBy(sortField),
-        startAt(queryText),
-        endAt(queryText + "\uf8ff")
-      )
-    );
+    console.log(order, sortField, queryText);
+
+    let teamsSnapshot: QuerySnapshot<DocumentData, DocumentData>;
+    if (queryText === "") {
+      teamsSnapshot = await getDocs(
+        query(collection(db, "teams"), orderBy(sortField))
+      );
+    } else {
+      teamsSnapshot = await getDocs(
+        query(
+          collection(db, "teams"),
+          orderBy(sortField),
+          startAt(queryText),
+          endAt(queryText + "\uf8ff")
+        )
+      );
+    }
+
     const teams = teamsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
+    console.log(teams);
 
     const ascDescTeams = order === "desc" ? teams.reverse() : teams;
 
@@ -91,9 +105,7 @@ router.get("/:id", async (req, res) => {
             const memberData = memberSnap.data() as IUser;
             return { id: memberSnap.id, ...memberData };
           } else {
-            console.log(
-              `No user (team member) found with the id: ${memberRef.id}`
-            );
+            console.log(`No user (member) found with the id: ${memberRef.id}`);
             return null;
           }
         });
@@ -115,7 +127,7 @@ router.get("/:id", async (req, res) => {
           teamData.teamLeader = { id: leaderSnap.id, ...leaderData };
         } else {
           console.log(
-            `No user (team leader) found with the id: ${teamData.teamLeader.id}`
+            `No user (leader) found with the id: ${teamData.teamLeader.id}`
           );
           return null;
         }
