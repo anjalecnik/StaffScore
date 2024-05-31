@@ -13,8 +13,6 @@ import {
   deleteDoc,
   arrayUnion,
   orderBy,
-  startAt,
-  endAt,
 } from "firebase/firestore";
 
 const router = Router();
@@ -22,28 +20,23 @@ const router = Router();
 /** GET all teams */
 router.get("/", async (req, res) => {
   try {
-    const { _sort, _order, q } = req.query;
+    const { _sort, _order } = req.query;
 
     const order = (_order as string) === "DESC" ? "desc" : "asc";
     let sortField = typeof _sort === "string" ? _sort : "lastModified";
-    const queryText = (q as string) ? q : "";
 
     if (sortField === "id") sortField = "lastModified";
 
     const teamsSnapshot = await getDocs(
-      query(
-        collection(db, "teams"),
-        orderBy(sortField),
-        startAt(queryText),
-        endAt(queryText + "\uf8ff")
-      )
+      query(collection(db, "teams"), orderBy(sortField, order))
     );
     const teams = teamsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    const ascDescTeams = order === "desc" ? teams.reverse() : teams;
+    const ascDescTeams =
+      order === "desc" ? teams.sort((one, two) => (one > two ? -1 : 1)) : teams;
 
     res.setHeader("X-Total-Count", ascDescTeams.length.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");

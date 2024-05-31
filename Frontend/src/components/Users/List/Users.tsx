@@ -7,8 +7,7 @@ import {
   CreateButton,
   ExportButton,
   TopToolbar,
-  SortButton,
-  SearchInput
+  SortButton
 } from 'react-admin';
 import UserIcon from '@mui/icons-material/Group';
 import { CustomAvatar } from './CustomAvatar';
@@ -17,7 +16,7 @@ export const UserList = () => {
   const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
 
   return (
-    <RaList filters={userFilters} actions={<UserListActions />}>
+    <RaList actions={<UserListActions />}>
       <Box display="flex" alignItems="center">
         <Box ml={2} mr={2} display="flex">
           <UserIcon color="disabled" fontSize="large" />
@@ -44,8 +43,6 @@ export const UserList = () => {
     </RaList>
   );
 };
-
-const userFilters = [<SearchInput source="q" alwaysOn />];
 
 const UserListActions = () => (
   <TopToolbar>

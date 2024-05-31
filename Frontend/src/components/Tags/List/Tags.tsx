@@ -1,4 +1,4 @@
-import { List, Box, Link, useMediaQuery, Theme } from '@mui/material';
+import { List, Box, Link } from '@mui/material';
 import {
   List as RaList,
   CreateButton,
@@ -6,16 +6,12 @@ import {
   TopToolbar,
   SortButton,
   Datagrid,
-  SearchInput,
-  TextField
+  SearchInput
 } from 'react-admin';
 import SellIcon from '@mui/icons-material/Sell';
 import { CustomChip } from './CustomChip';
-import { ColorField } from 'react-admin-color-picker';
 
 export const TagList = () => {
-  const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
-
   return (
     <RaList filters={tagFilters} actions={<TagListActions />}>
       <Box display="flex" alignItems="center">
@@ -28,16 +24,9 @@ export const TagList = () => {
       </Box>
 
       <List>
-        {isSmall ? (
-          <Datagrid rowClick="edit">
-            <CustomChip />
-          </Datagrid>
-        ) : (
-          <Datagrid rowClick="edit">
-            <TextField source="name" />
-            <ColorField source="color" />
-          </Datagrid>
-        )}
+        <Datagrid rowClick="edit">
+          <CustomChip />
+        </Datagrid>
       </List>
     </RaList>
   );

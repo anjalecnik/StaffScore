@@ -1,15 +1,13 @@
-import { List, TopToolbar, ExportButton, CreateButton, SortButton, SearchInput } from 'react-admin';
+import { List, TopToolbar, ExportButton, CreateButton, SortButton } from 'react-admin';
 import { ImageList } from './GridList';
 
 export const TeamList = () => {
   return (
-    <List filters={teamsFilters} actions={<TeamListActions />}>
+    <List actions={<TeamListActions />}>
       <ImageList />
     </List>
   );
 };
-
-const teamsFilters = [<SearchInput source="q" alwaysOn />];
 
 const TeamListActions = () => {
   return (

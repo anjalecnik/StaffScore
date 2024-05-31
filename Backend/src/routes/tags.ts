@@ -20,25 +20,13 @@ const router = Router();
 /** GET all tags */
 router.get("/", async (req, res) => {
   try {
-    const { _limit, _page, _sort, _order, q } = req.query;
+    const { q } = req.query;
 
-    const end =
-      parseInt(_limit as string, 10) * parseInt(_page as string, 10) || 10;
-    let start =
-      (parseInt(_page as string, 10) - 1) * parseInt(_limit as string, 10) || 0;
-    const order = (_order as string) === "DESC" ? "desc" : "asc";
-    let sortField = typeof _sort === "string" ? _sort : "lastModified";
     const queryText = (q as string) ? q : "";
-
-    if (sortField === "id") sortField = "lastModified";
-
-    if (parseInt(_page as string, 10) == 1) {
-      start = 0;
-    }
 
     const tagsSnapshot = query(
       collection(db, "tags"),
-      orderBy(sortField),
+      orderBy("name"),
       startAt(queryText),
       endAt(queryText + "\uf8ff")
     );
@@ -50,18 +38,12 @@ router.get("/", async (req, res) => {
       ...doc.data(),
     }));
 
-    const ascDescTags = order === "desc" ? tags.reverse() : tags;
-
-    const filteredTags = ascDescTags.slice(start, end);
-
-    const totalRecords = tagsDocs.size;
-
     res.setHeader("X-Total-Count", tags.length.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
 
     res.json({
-      data: filteredTags,
-      total: totalRecords,
+      data: tags,
+      total: tags.length,
     });
   } catch (error) {
     console.error("Error getting teams", error);

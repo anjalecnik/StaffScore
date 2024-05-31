@@ -12,8 +12,6 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
-  startAt,
-  endAt,
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
 
@@ -22,7 +20,7 @@ const router = Router();
 /** GET all users */
 router.get("/", async (req, res) => {
   try {
-    const { _limit, _page, _sort, _order, q } = req.query;
+    const { _limit, _page, _sort, _order } = req.query;
 
     const end =
       parseInt(_limit as string, 10) * parseInt(_page as string, 10) || 10;
@@ -30,7 +28,6 @@ router.get("/", async (req, res) => {
       (parseInt(_page as string, 10) - 1) * parseInt(_limit as string, 10) || 0;
     const order = (_order as string) === "DESC" ? "desc" : "asc";
     let sortField = typeof _sort === "string" ? _sort : "lastModified";
-    const queryText = (q as string) ? q : "";
 
     if (sortField === "id") sortField = "lastModified";
 
@@ -39,12 +36,7 @@ router.get("/", async (req, res) => {
     }
 
     const usersSnapshot = await getDocs(
-      query(
-        collection(db, "users"),
-        orderBy(sortField),
-        startAt(queryText),
-        endAt(queryText + "\uf8ff")
-      )
+      query(collection(db, "users"), orderBy(sortField, order))
     );
 
     let formattedUsers = usersSnapshot.docs.map((doc) => ({
@@ -53,7 +45,9 @@ router.get("/", async (req, res) => {
     }));
 
     const ascDescUsers =
-      order === "desc" ? formattedUsers.reverse() : formattedUsers;
+      order === "desc"
+        ? formattedUsers.sort((one, two) => (one > two ? -1 : 1))
+        : formattedUsers;
 
     const filteredUsers = ascDescUsers.slice(start, end);
 
