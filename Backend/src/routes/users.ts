@@ -14,6 +14,8 @@ import {
   deleteDoc,
   startAt,
   endAt,
+  Query,
+  DocumentData,
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
 
@@ -38,14 +40,19 @@ router.get("/", async (req, res) => {
       start = 0;
     }
 
-    const usersSnapshot = await getDocs(
-      query(
+    let qu: Query<DocumentData, DocumentData>;
+    if (queryText === "") {
+      qu = query(collection(db, "users"), orderBy(sortField));
+    } else {
+      qu = query(
         collection(db, "users"),
         orderBy(sortField),
         startAt(queryText),
         endAt(queryText + "\uf8ff")
-      )
-    );
+      );
+    }
+
+    const usersSnapshot = await getDocs(qu);
 
     let formattedUsers = usersSnapshot.docs.map((doc) => ({
       id: doc.id,
