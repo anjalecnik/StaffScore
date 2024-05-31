@@ -33,12 +33,7 @@ router.get("/", async (req, res) => {
     console.log(order, sortField, queryText);
 
     const teamsSnapshot = await getDocs(
-      query(
-        collection(db, "teams"),
-        orderBy(sortField),
-        startAt(queryText),
-        endAt(queryText + "\uf8ff")
-      )
+      query(collection(db, "teams"), orderBy(sortField))
     );
     const teams = teamsSnapshot.docs.map((doc) => ({
       id: doc.id,
