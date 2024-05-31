@@ -11,6 +11,8 @@ export const dataProvider: DataProvider = {
 
     const { q } = params.filter;
 
+    console.log(page, perPage, field, order, q);
+
     let response: any;
     if (q)
       response = await fetchUtils.fetchJson(

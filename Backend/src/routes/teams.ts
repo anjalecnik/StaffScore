@@ -30,6 +30,8 @@ router.get("/", async (req, res) => {
 
     if (sortField === "id") sortField = "lastModified";
 
+    console.log(order, sortField, queryText);
+
     const teamsSnapshot = await getDocs(
       query(
         collection(db, "teams"),
@@ -42,6 +44,8 @@ router.get("/", async (req, res) => {
       id: doc.id,
       ...doc.data(),
     }));
+
+    console.log(teams);
 
     const ascDescTeams = order === "desc" ? teams.reverse() : teams;
 
