@@ -91,7 +91,9 @@ router.get("/:id", async (req, res) => {
             const memberData = memberSnap.data() as IUser;
             return { id: memberSnap.id, ...memberData };
           } else {
-            console.log(`No user (member) found with the id: ${memberRef.id}`);
+            console.log(
+              `No user (team member) found with the id: ${memberRef.id}`
+            );
             return null;
           }
         });
@@ -113,7 +115,7 @@ router.get("/:id", async (req, res) => {
           teamData.teamLeader = { id: leaderSnap.id, ...leaderData };
         } else {
           console.log(
-            `No user (leader) found with the id: ${teamData.teamLeader.id}`
+            `No user (team leader) found with the id: ${teamData.teamLeader.id}`
           );
           return null;
         }
