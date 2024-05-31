@@ -13,6 +13,8 @@ import {
   startAt,
   orderBy,
   endAt,
+  Query,
+  DocumentData,
 } from "firebase/firestore";
 
 const router = Router();
@@ -36,14 +38,19 @@ router.get("/", async (req, res) => {
       start = 0;
     }
 
-    const tagsSnapshot = query(
-      collection(db, "tags"),
-      orderBy(sortField),
-      startAt(queryText),
-      endAt(queryText + "\uf8ff")
-    );
+    let qu: Query<DocumentData, DocumentData>;
+    if (queryText === "") {
+      qu = query(collection(db, "tags"), orderBy(sortField));
+    } else {
+      qu = query(
+        collection(db, "tags"),
+        orderBy(sortField),
+        startAt(queryText),
+        endAt(queryText + "\uf8ff")
+      );
+    }
 
-    const tagsDocs = await getDocs(tagsSnapshot);
+    const tagsDocs = await getDocs(qu);
 
     const tags = tagsDocs.docs.map((doc) => ({
       id: doc.id,

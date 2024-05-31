@@ -15,7 +15,6 @@ import {
   orderBy,
   startAt,
   endAt,
-  QuerySnapshot,
   DocumentData,
   Query,
 } from "firebase/firestore";
