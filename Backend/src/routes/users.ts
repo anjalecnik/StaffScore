@@ -117,7 +117,12 @@ router.get("/:id", async (req, res) => {
 
         userData.tags = tagsArray;
 
-        let formattedUser = {
+        let formattedUser: {
+          id: string;
+          tags?: ITag[];
+          tags_ids?: string[];
+          [key: string]: any;
+        } = {
           id: userDoc.id,
           ...userData,
         };
@@ -148,6 +153,8 @@ router.get("/:id", async (req, res) => {
             ...userData,
           };
         }
+
+        formattedUser.tags_ids = userData.tags.map((tag: any) => tag.id.trim());
 
         res.json(formattedUser);
       } else {
@@ -196,11 +203,12 @@ router.get("/:id", async (req, res) => {
 
 /** CREATE new user */
 router.post("/", async (req, res) => {
-  const { email, ...otherAttributes } = req.body;
+  const { email, tags_ids, ...otherAttributes } = req.body;
 
   try {
     const newUserRef = await addDoc(collection(db, "users"), {
       email: email,
+      tags: tags_ids.map((id: string) => doc(db, "tags", id)),
       lastModified: serverTimestamp(),
       ...otherAttributes,
     });
@@ -249,7 +257,7 @@ async function sendWelcomeEmail(userEmail: string) {
 /** UPDATE user */
 router.put("/:userId", async (req, res) => {
   const { userId } = req.params;
-  const { tags, ...userDataToUpdate } = req.body; // Don't update tags!!
+  const { tags, tags_ids, ...userDataToUpdate } = req.body; // Don't update tags!!
 
   try {
     const userDocRef = doc(db, "users", userId);
@@ -259,10 +267,15 @@ router.put("/:userId", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    await updateDoc(userDocRef, {
+    const updateData: { [key: string]: any } = {
       ...userDataToUpdate,
       lastModified: serverTimestamp(),
-    });
+    };
+
+    if (tags_ids !== undefined)
+      updateData.tags = tags_ids.map((id: string) => doc(db, "tags", id));
+
+    await updateDoc(userDocRef, updateData);
 
     const updatedUserDocSnapshot = await getDoc(userDocRef);
     const updatedUserData = updatedUserDocSnapshot.data();
