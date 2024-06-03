@@ -4,6 +4,10 @@ import { auth, googleProvider } from './../config/firebase';
 import { useNavigate } from 'react-router-dom';
 import './../assets/auth.css';
 import { Alert } from '@mui/material';
+import Cookies from 'universal-cookie';
+import { API_URL } from '../dataProvider';
+
+const cookies = new Cookies(null, { path: '/' });
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -14,7 +18,7 @@ export const LoginPage = () => {
       const result = await signInWithPopup(auth, googleProvider);
 
       try {
-        const response = await fetch('https://staff-score.vercel.app/api/users/check-user', {
+        const response = await fetch(`${API_URL}/users/check-user`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -24,10 +28,13 @@ export const LoginPage = () => {
 
         if (response.ok) {
           notify(<Alert severity="success">Welcome back!</Alert>, { autoHideDuration: 3000 });
+          const { userData } = await response.json();
 
-          const { userData, userId } = await response.json();
-          localStorage.setItem('username', userData); //TODO: handle logged user with state
-          localStorage.setItem('userId', userId);
+          cookies.set('sessionToken', userData.id, {
+            path: '/',
+            sameSite: 'strict',
+            secure: true
+          });
 
           navigate('/');
         } else {
