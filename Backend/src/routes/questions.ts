@@ -40,14 +40,12 @@ router.get("/", async (req, res) => {
 
 /** CREATE new question */
 router.post("/", async (req, res) => {
-  const { text, type , otherAttributes} = req.body;
-  console.log("text" + text);	
-  console.log("type" + type);
+  const { text, type, ...otherAttributes } = req.body;
 
   try {
     const newQuestionRef = await addDoc(collection(db, "questions"), {
       question: text,
-      type : type,
+      type: type,
       ...otherAttributes,
     });
 
@@ -59,6 +57,7 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 /** UPDATE question */
 router.put("/:questionId", async (req, res) => {

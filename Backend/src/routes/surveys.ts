@@ -71,11 +71,32 @@ router.get("/:id", async (req, res) => {
 
 /** CREATE new survey */
 router.post("/", async (req, res) => {
-  const { questions_ids, ...otherAttributes} = req.body;
+  const { questions, ...otherAttributes } = req.body;
 
   try {
+    const questionDataList: { id: string, weight: number }[] = [];
+
+    for (const questionData of questions) {
+      if (questionData.questionId) {
+        const questionDoc = await getDoc(doc(db, "questions", questionData.questionId));
+        if (questionDoc.exists()) {
+          questionDataList.push({ id: questionData.questionId, weight: questionData.weight });
+          continue;
+        } else {
+          throw new Error(`Question with ID ${questionData.questionId} does not exist`);
+        }
+      } else {
+        const newQuestionRef = await addDoc(collection(db, "questions"), {
+          question: questionData.question,
+          type: questionData.type
+        });
+        questionDataList.push({ id: newQuestionRef.id, weight: questionData.weight });
+      }
+    }
+
     const newSurveyRef = await addDoc(collection(db, "questionnaires"), {
-      questions: questions_ids.map((id: string) => doc(db, "questions", id)),
+      questions: questionDataList.map(({ id }) => doc(db, "questions", id)),
+      questionWeights: questionDataList.reduce((acc, { id, weight }) => ({ ...acc, [id]: weight }), {}),
       ...otherAttributes
     });
 
@@ -84,14 +105,20 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(newSurvey);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    console.error(error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message || "Internal server error" });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 });
+
 
 /** UPDATE survey */
 router.put("/:surveyId", async (req, res) => {
   const { surveyId } = req.params;
-  const { name, question_ids } = req.body;
+  const { name, questions } = req.body;
 
   try {
     const surveyDocRef = doc(db, "questionnaires", surveyId);
@@ -106,10 +133,16 @@ router.put("/:surveyId", async (req, res) => {
     };
 
     if (name !== undefined) updateData.name = name;
-    if (question_ids !== undefined)
-      updateData.questions = question_ids.map((id: string) =>
-        doc(db, "questions", id)
-      );
+    
+    if (questions !== undefined && questions.length > 0) {
+      const questionDocs = questions.map((question: any) => {
+        return {
+          questionId: question.questionId,
+          weight: question.weight
+        };
+      });
+      updateData.questions = questionDocs;
+    }
 
     await updateDoc(surveyDocRef, updateData);
 
@@ -124,6 +157,8 @@ router.put("/:surveyId", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 
 /** DELETE survey */
 router.delete("/:surveyId", async (req, res) => {
