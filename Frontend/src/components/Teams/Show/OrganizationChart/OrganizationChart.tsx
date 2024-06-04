@@ -42,7 +42,7 @@ const CardTemplate = ({ user }: CardTemplateProps) => {
   };
 
   return (
-    <Card>
+    <Card key={user.id}>
       <CardContent>
         <Box display="flex" justifyContent="center">
           <Avatar src={user?.photoUrl} />

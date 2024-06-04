@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ShowBase, useShowContext } from 'react-admin';
-import { Box, Card, CardContent, Typography, Tabs, Tab, Divider } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Tabs,
+  Tab,
+  Divider,
+  useMediaQuery,
+  Theme
+} from '@mui/material';
 import { IUser } from '../../../types/IUser';
 import { Avatar } from './Avatar';
 import Rating from '@mui/material/Rating';
@@ -8,6 +18,7 @@ import Aside from './Aside';
 import BadgeIcon from '@mui/icons-material/Badge';
 import { useState } from 'react';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
+import { BasicInformation } from './BasicInformation';
 
 export const UserShow = () => (
   <ShowBase>
@@ -16,6 +27,7 @@ export const UserShow = () => (
 );
 
 const UserShowContent = () => {
+  const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
   const [tabValue, setTabValue] = useState(0);
 
   const { record } = useShowContext<IUser>();
@@ -72,44 +84,7 @@ const UserShowContent = () => {
               <Divider />
               <TabPanel value={tabValue} index={0}>
                 <CardContent>
-                  <Typography variant="body1" component="div" gutterBottom>
-                    Display name: {record.displayName || '/'}
-                  </Typography>
-                  <Typography variant="body1" color="textSecondary">
-                    Email: {record.email || '/'}
-                  </Typography>
-                  <Typography variant="body1" color="textSecondary">
-                    Phone number: {record.phoneNumber ? record.phoneNumber : '/'}
-                  </Typography>
-
-                  {record.address ? (
-                    <Box mt={3}>
-                      <Typography variant="body1" color="textSecondary">
-                        Address: {record.address}, {record.city}, {record.zipcode}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Box mt={3}>
-                      <Typography variant="body1" color="textSecondary">
-                        Address: /
-                      </Typography>
-                    </Box>
-                  )}
-
-                  <Box mt={3}>
-                    <Typography variant="body1" color="textSecondary">
-                      Employment date: {record.employmentDate?.toLocaleString() || '/'}
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary">
-                      Card identifier: {record.cardIdentifier || '/'}
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary">
-                      Time&Space identifier: {record.timeSpaceIdentifier || '/'}
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary">
-                      Teamwork identifier: {record.teamworkIdentifier || '/'}
-                    </Typography>
-                  </Box>
+                  <BasicInformation />
                 </CardContent>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
@@ -120,7 +95,7 @@ const UserShowContent = () => {
             </CardContent>
           </Card>
         </Box>
-        <Aside />
+        {!isSmall && <Aside />}
       </Box>
     </>
   );
