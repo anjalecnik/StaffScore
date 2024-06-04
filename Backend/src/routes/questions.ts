@@ -38,6 +38,34 @@ router.get("/", async (req, res) => {
   }
 });
 
+/** GET question by document id */
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const questionsRef = collection(db, "questions");
+    const q = query(questionsRef, where("__name__", "==", id));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const questionDoc = querySnapshot.docs[0];
+      const questionData = questionDoc.data();
+
+      const formattedQuestion = {
+        id: questionDoc.id,
+        ...questionData,
+      };
+
+      res.json(formattedQuestion);
+    } else {
+      res.status(404).json({ message: "No question found with the id: " + id });
+    }
+  } catch (error) {
+    console.error("Error getting question by id:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 /** CREATE new question */
 router.post("/", async (req, res) => {
   const { text, type, ...otherAttributes } = req.body;
@@ -92,6 +120,7 @@ router.put("/:questionId", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 /** DELETE question */
 router.delete("/:questionId", async (req, res) => {

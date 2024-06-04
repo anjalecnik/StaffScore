@@ -3,6 +3,7 @@ import { dataProvider } from './dataProvider';
 import UserIcon from '@mui/icons-material/Group';
 import GroupsIcon from '@mui/icons-material/Groups';
 import PollIcon from '@mui/icons-material/Poll';
+import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 import { Dashboard } from './components/Dashboard';
 import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
@@ -18,6 +19,10 @@ import { TeamCreate } from './components/Teams/Create/TeamCreate';
 import { TeamEdit } from './components/Teams/Edit/TeamEdit';
 import { SurveyCreate } from './components/Surveys/Create/SurveyCreate';
 import { SurveyEdit } from './components/Surveys/Edit/SurveyEdit';
+import { QuestionList } from './components/Questions/List/Questions';
+import { QuestionCreate } from './components/Questions/Create/QuestionCreate';
+import { QuestionShow } from './components/Questions/Show/QuestionShow';
+import { QuestionEdit } from './components/Questions/Edit/QuestionEdit';
 
 export default function App() {
   return (
@@ -55,6 +60,15 @@ export default function App() {
           edit={SurveyEdit}
           recordRepresentation="name"
           icon={PollIcon}
+        />
+        <Resource
+          name="questions"
+          list={QuestionList}
+          show={QuestionShow}
+          create={QuestionCreate}
+          edit={QuestionEdit}
+          recordRepresentation="question"
+          icon={HelpCenterIcon}
         />
       </Admin>
     </>
