@@ -1,7 +1,7 @@
 import { useRecordContext } from 'react-admin';
-import { IUser } from '../../../types/IUser';
 import { Typography, useMediaQuery, Theme, Box } from '@mui/material';
 import './../../../assets/details.css';
+import { IUser } from '../../../types/IUser';
 
 export const BasicInformation = () => {
   const record = useRecordContext<IUser>();
@@ -91,15 +91,6 @@ export const BasicInformation = () => {
                 </Typography>
               </div>
               <div className="value">{recordFullAddress}</div>
-            </li>
-
-            <li className="label-value-item">
-              <div className="label">
-                <Typography variant="body1" color="textSecondary">
-                  Employment date
-                </Typography>
-              </div>
-              <div className="value">{record.employmentDate?.toLocaleString() || '/'}</div>
             </li>
           </ul>
 

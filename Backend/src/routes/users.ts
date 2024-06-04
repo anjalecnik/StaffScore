@@ -16,6 +16,7 @@ import {
   endAt,
   Query,
   DocumentData,
+  Timestamp,
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
 
@@ -83,6 +84,19 @@ interface ITag {
   color: string;
 }
 
+interface IStatistic {
+  date: Date;
+  name: string;
+  evaluation: number;
+  questionnaireId: number;
+}
+
+interface IQuarterlyStatistic {
+  name: string;
+  avgEv: number;
+  [key: string]: number | string;
+}
+
 /** GET by document id */
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -95,6 +109,96 @@ router.get("/:id", async (req, res) => {
     if (!querySnapshot.empty) {
       const userDoc = querySnapshot.docs[0];
       const userData = userDoc.data();
+
+      const statisticsSnapshot = await getDocs(
+        query(
+          collection(db, "statistics"),
+          where("user", "==", doc(db, "users", id))
+        )
+      );
+
+      const statistics: IStatistic[] = statisticsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        name:
+          doc.data().timestamp.toDate().getFullYear() +
+          "-" +
+          (doc.data().timestamp.toDate().getMonth() + 1),
+        evaluation: doc.data().evaluation,
+        questionnaireId: doc.data().questionnaire.id,
+        date: doc.data().timestamp.toDate(),
+      }));
+
+      const allQuestionnaireIds = Array.from(
+        new Set(statistics.map((stat) => stat.questionnaireId))
+      );
+
+      const groupedByQuarter = statistics.reduce(
+        (acc: { [key: string]: IStatistic[] }, stat: IStatistic) => {
+          const quarterName = getQuarterName(stat.date);
+          if (!acc[quarterName]) {
+            acc[quarterName] = [];
+          }
+          acc[quarterName].push(stat);
+          return acc;
+        },
+        {}
+      );
+
+      const result: IQuarterlyStatistic[] = Object.keys(groupedByQuarter).map(
+        (quarter) => {
+          const stats = groupedByQuarter[quarter];
+          const totalEvaluation = stats.reduce(
+            (sum, stat) => sum + stat.evaluation,
+            0
+          );
+          const avgEv = totalEvaluation / stats.length;
+
+          const questionnaireAvg = stats.reduce(
+            (acc: { [key: string]: number[] }, stat) => {
+              if (!acc[stat.questionnaireId]) {
+                acc[stat.questionnaireId] = [];
+              }
+              acc[stat.questionnaireId].push(stat.evaluation);
+              return acc;
+            },
+            {}
+          );
+
+          const questionnaireAvgResult = allQuestionnaireIds.reduce(
+            (acc: { [key: string]: number | null }, qId) => {
+              if (questionnaireAvg[qId]) {
+                const total = questionnaireAvg[qId].reduce(
+                  (sum, evaluation) => sum + evaluation,
+                  0
+                );
+                acc[qId] = total / questionnaireAvg[qId].length;
+              } else {
+                acc[qId] = null;
+              }
+              return acc;
+            },
+            {}
+          );
+
+          return {
+            name: quarter,
+            avgEv,
+            ...questionnaireAvgResult,
+          };
+        }
+      );
+
+      result.sort((a, b) => a.name.localeCompare(b.name));
+
+      userData.statistics = result;
+
+      const totalEvaluation = statistics.reduce(
+        (acc, statistic) => acc + statistic.evaluation,
+        0
+      );
+      const averageEvaluation = totalEvaluation / statistics.length;
+
+      userData.averageEvaluation = averageEvaluation * 5;
 
       if (userData.tags && Array.isArray(userData.tags)) {
         const tagPromises = userData.tags.map(async (tagRef) => {
@@ -121,6 +225,8 @@ router.get("/:id", async (req, res) => {
           id: string;
           tags?: ITag[];
           tags_ids?: string[];
+          statistics?: any[];
+          averageEvaluation?: number;
           [key: string]: any;
         } = {
           id: userDoc.id,
@@ -200,6 +306,13 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+function getQuarterName(date: Date): string {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const quarter = Math.ceil(month / 3);
+  return `${year}-Q${quarter}`;
+}
 
 /** CREATE new user */
 router.post("/", async (req, res) => {

@@ -1,6 +1,6 @@
 import { useRecordContext, EditButton, ShowButton } from 'react-admin';
 import { Box, Typography, Divider } from '@mui/material';
-import { IUser } from '../../../types/IUser';
+import { IUser } from '../../../../types/IUser';
 import { TagsIterator } from './TagsIterator';
 import { TeamsIterator } from './TeamsIterator';
 

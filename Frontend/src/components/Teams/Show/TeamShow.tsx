@@ -17,9 +17,9 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { useEffect, useState } from 'react';
 import { OrganizationChart } from './OrganizationChart/OrganizationChart';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import { StatisticsChart } from './StatisticsChart/StatisticsChart';
 import Alert from '@mui/material/Alert';
 import { BasicInformation } from './BasicInformation';
+import { StatisticsChart } from './StatisticsChart/StatisticsChart';
 
 export const TeamShow = () => (
   <ShowBase>
