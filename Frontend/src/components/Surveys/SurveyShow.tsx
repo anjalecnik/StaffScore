@@ -1,4 +1,4 @@
-import { ShowBase, useShowContext, Title, EditButton } from 'react-admin';
+import { ShowBase, useShowContext, Title, EditButton, DeleteButton } from 'react-admin';
 import { Card, CardContent, Container, Divider, Typography, Box, Slider, FormControl, FormLabel, RadioGroup, Radio, FormControlLabel } from '@mui/material';
 import { ISurvey } from '../../types/ISurvey';
 
@@ -10,8 +10,6 @@ export const SurveyShow = () => (
 
 const SurveyShowContent = () => {
   const { record } = useShowContext<ISurvey>();
-
-  console.log("Survey Record:", record);
 
   if (!record || !Array.isArray(record.questions)) return null;
 
@@ -25,6 +23,7 @@ const SurveyShowContent = () => {
           </Typography>
           <Box>
             <EditButton label="Edit Survey" />
+            <DeleteButton/>
           </Box>
           <Divider />
           <Box mt={3}>

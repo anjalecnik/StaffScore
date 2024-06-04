@@ -3,5 +3,6 @@ import { IQuestion } from "./IQuestion";
 export interface ISurvey {
     id: string;
     name: string;
-    questions : IQuestion;
+    questions : IQuestion[];
+    questionWeights: { [key: string]: number };
   }
