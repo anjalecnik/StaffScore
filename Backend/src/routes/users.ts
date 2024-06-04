@@ -5,8 +5,6 @@ import {
   collection,
   query,
   orderBy,
-  limit,
-  startAt,
   addDoc,
   serverTimestamp,
   where,
@@ -14,46 +12,76 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
+  startAt,
+  endAt,
+  Query,
+  DocumentData,
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
 
-const axios = require("axios");
 const router = Router();
 
 /** GET all users */
 router.get("/", async (req, res) => {
   try {
-    const { _end, _order, _sort, _start } = req.query;
+    const { _limit, _page, _sort, _order, q } = req.query;
 
-    const end = parseInt(_end as string, 10) || 10;
-    const start = parseInt(_start as string, 10) || 0;
-    const order = (_order as string) === "DESC" ? "asc" : "asc"; // TODO: enable filtering by desc (https://www.reddit.com/r/Firebase/comments/16p5a4d/pagination_with_sorting_and_filtering/)
+    const end =
+      parseInt(_limit as string, 10) * parseInt(_page as string, 10) || 10;
+    let start =
+      (parseInt(_page as string, 10) - 1) * parseInt(_limit as string, 10) || 0;
+    const order = (_order as string) === "DESC" ? "desc" : "asc";
     let sortField = typeof _sort === "string" ? _sort : "lastModified";
+    const queryText = (q as string) ? q : "";
 
-    if (sortField == "id") sortField = "lastModified";
+    if (sortField === "id") sortField = "lastModified";
 
-    const usersSnapshot = await query(
-      collection(db, "users"),
-      orderBy(sortField, order),
-      startAt(start),
-      limit(end - start)
-    );
+    if (parseInt(_page as string, 10) == 1) {
+      start = 0;
+    }
 
-    const users = await getDocs(usersSnapshot);
+    let qu: Query<DocumentData, DocumentData>;
+    if (queryText === "") {
+      qu = query(collection(db, "users"), orderBy(sortField));
+    } else {
+      qu = query(
+        collection(db, "users"),
+        orderBy(sortField),
+        startAt(queryText),
+        endAt(queryText + "\uf8ff")
+      );
+    }
 
-    const formattedUsers = users.docs.map((doc) => ({
+    const usersSnapshot = await getDocs(qu);
+
+    let formattedUsers = usersSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    res.setHeader("X-Total-Count", formattedUsers.length.toString());
+    const ascDescUsers =
+      order === "desc" ? formattedUsers.reverse() : formattedUsers;
+
+    const filteredUsers = ascDescUsers.slice(start, end);
+
+    const totalRecords = usersSnapshot.size;
+
+    res.setHeader("X-Total-Count", totalRecords.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");
 
-    res.json(formattedUsers);
+    res.json({
+      data: filteredUsers,
+      total: totalRecords,
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+interface ITag {
+  name: string;
+  color: string;
+}
 
 /** GET by document id */
 router.get("/:id", async (req, res) => {
@@ -69,32 +97,98 @@ router.get("/:id", async (req, res) => {
       const userData = userDoc.data();
 
       if (userData.tags && Array.isArray(userData.tags)) {
-        const tagPromises = userData.tags.map((tagRef) => {
-          const tagId = tagRef.id.trim();
-          return axios
-            .get(`https://staff-score.vercel.app/api/tags/${tagId}`)
-            .then((response: { data: any }) => response.data)
-            .catch((error: any) => {
-              console.error(`Error fetching tag with id: ${tagId}`, error);
-              throw new Error(`Error fetching tag with id: ${tagId}`);
-            });
+        const tagPromises = userData.tags.map(async (tagRef) => {
+          const trimmedTagId = tagRef.id.trim(); // Trim any leading or trailing spaces from the tag ID
+          const trimmedTagRef = doc(db, "tags", trimmedTagId);
+
+          const tagSnap = await getDoc(trimmedTagRef);
+          if (tagSnap.exists()) {
+            const tagData = tagSnap.data() as ITag;
+            return { id: tagSnap.id, ...tagData };
+          } else {
+            console.log(`No tag found with the id: ${tagRef.id}`);
+            return null;
+          }
         });
 
-        const tagsArray = await Promise.all(tagPromises);
+        const tagsArray = (await Promise.all(tagPromises)).filter(
+          (tag) => tag !== null
+        );
 
         userData.tags = tagsArray;
 
-        const formattedUser = {
+        let formattedUser: {
+          id: string;
+          tags?: ITag[];
+          tags_ids?: string[];
+          [key: string]: any;
+        } = {
           id: userDoc.id,
           ...userData,
         };
 
+        if (userData.teams && Array.isArray(userData.teams)) {
+          const teamPromises = userData.teams.map(async (teamRef) => {
+            const trimmedTeamId = teamRef.id.trim();
+            const trimmedTeamRef = doc(db, "teams", trimmedTeamId);
+
+            const teamSnap = await getDoc(trimmedTeamRef);
+            if (teamSnap.exists()) {
+              const teamData = teamSnap.data() as ITag;
+              return { id: teamSnap.id, ...teamData };
+            } else {
+              console.log(`No team found with the id: ${teamRef.id}`);
+              return null;
+            }
+          });
+
+          const teamsArray = (await Promise.all(teamPromises)).filter(
+            (team) => team !== null
+          );
+
+          userData.teams = teamsArray;
+
+          formattedUser = {
+            id: userDoc.id,
+            ...userData,
+          };
+        }
+
+        formattedUser.tags_ids = userData.tags.map((tag: any) => tag.id.trim());
+
         res.json(formattedUser);
       } else {
-        const formattedUser = {
+        let formattedUser = {
           id: userDoc.id,
           ...userData,
         };
+
+        if (userData.teams && Array.isArray(userData.teams)) {
+          const teamPromises = userData.teams.map(async (teamRef) => {
+            const trimmedTeamId = teamRef.id.trim();
+            const trimmedTeamRef = doc(db, "teams", trimmedTeamId);
+
+            const teamSnap = await getDoc(trimmedTeamRef);
+            if (teamSnap.exists()) {
+              const teamData = teamSnap.data() as ITag;
+              return { id: teamSnap.id, ...teamData };
+            } else {
+              console.log(`No team found with the id: ${teamRef.id}`);
+              return null;
+            }
+          });
+
+          const teamsArray = (await Promise.all(teamPromises)).filter(
+            (team) => team !== null
+          );
+
+          userData.teams = teamsArray;
+
+          formattedUser = {
+            id: userDoc.id,
+            ...userData,
+          };
+        }
 
         res.json(formattedUser);
       }
@@ -109,11 +203,12 @@ router.get("/:id", async (req, res) => {
 
 /** CREATE new user */
 router.post("/", async (req, res) => {
-  const { email, ...otherAttributes } = req.body;
+  const { email, tags_ids, ...otherAttributes } = req.body;
 
   try {
     const newUserRef = await addDoc(collection(db, "users"), {
       email: email,
+      tags: tags_ids.map((id: string) => doc(db, "tags", id)),
       lastModified: serverTimestamp(),
       ...otherAttributes,
     });
@@ -162,7 +257,7 @@ async function sendWelcomeEmail(userEmail: string) {
 /** UPDATE user */
 router.put("/:userId", async (req, res) => {
   const { userId } = req.params;
-  const { tags, ...userDataToUpdate } = req.body; // Don't update tags!!
+  const { tags, tags_ids, ...userDataToUpdate } = req.body; // Don't update tags!!
 
   try {
     const userDocRef = doc(db, "users", userId);
@@ -172,10 +267,15 @@ router.put("/:userId", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    await updateDoc(userDocRef, {
+    const updateData: { [key: string]: any } = {
       ...userDataToUpdate,
       lastModified: serverTimestamp(),
-    });
+    };
+
+    if (tags_ids !== undefined)
+      updateData.tags = tags_ids.map((id: string) => doc(db, "tags", id));
+
+    await updateDoc(userDocRef, updateData);
 
     const updatedUserDocSnapshot = await getDoc(userDocRef);
     const updatedUserData = updatedUserDocSnapshot.data();
@@ -201,7 +301,7 @@ router.delete("/:userId", async (req, res) => {
 
     await deleteDoc(userDocRef);
 
-    res.status(200).json();
+    res.status(200).json([]);
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "Internal server error" });

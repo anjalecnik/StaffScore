@@ -7,16 +7,17 @@ import {
   CreateButton,
   ExportButton,
   TopToolbar,
-  SortButton
+  SortButton,
+  SearchInput
 } from 'react-admin';
 import UserIcon from '@mui/icons-material/Group';
-import { CustomerAvatar } from './CustomAvatar';
+import { CustomAvatar } from './CustomAvatar';
 
 export const UserList = () => {
   const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
 
   return (
-    <RaList actions={<UserListActions />}>
+    <RaList filters={userFilters} actions={<UserListActions />}>
       <Box display="flex" alignItems="center">
         <Box ml={2} mr={2} display="flex">
           <UserIcon color="disabled" fontSize="large" />
@@ -34,7 +35,7 @@ export const UserList = () => {
           />
         ) : (
           <Datagrid rowClick="show">
-            <CustomerAvatar size="small" />
+            <CustomAvatar size="small" />
             <TextField source="displayName" />
             <TextField source="email" />
           </Datagrid>
@@ -43,6 +44,8 @@ export const UserList = () => {
     </RaList>
   );
 };
+
+const userFilters = [<SearchInput source="q" alwaysOn />];
 
 const UserListActions = () => (
   <TopToolbar>

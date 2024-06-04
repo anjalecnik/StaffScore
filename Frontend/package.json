@@ -14,7 +14,10 @@
     "ra-data-json-server": "^4.16.17",
     "react": "^18.2.0",
     "react-admin": "^4.16.18",
-    "react-dom": "^18.2.0"
+    "react-admin-color-picker": "^1.0.3",
+    "react-dom": "^18.2.0",
+    "react-organizational-chart": "^2.2.1",
+    "universal-cookie": "^7.1.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

@@ -73,31 +73,43 @@ const UserShowContent = () => {
               <TabPanel value={tabValue} index={0}>
                 <CardContent>
                   <Typography variant="body1" component="div" gutterBottom>
-                    {record.displayName}
+                    Display name: {record.displayName || '/'}
                   </Typography>
                   <Typography variant="body1" color="textSecondary">
-                    {record.email}
+                    Email: {record.email || '/'}
                   </Typography>
                   <Typography variant="body1" color="textSecondary">
-                    {record.phoneNumber}
+                    Phone number: {record.phoneNumber ? record.phoneNumber : '/'}
                   </Typography>
 
                   {record.address ? (
                     <Box mt={3}>
-                      <Typography variant="h6" gutterBottom>
-                        Address
-                      </Typography>
                       <Typography variant="body1" color="textSecondary">
-                        {record.address}, {record.city}, {record.zipcode}
+                        Address: {record.address}, {record.city}, {record.zipcode}
                       </Typography>
                     </Box>
                   ) : (
-                    <Box mt={3} sx={{ fontStyle: 'italic' }}>
+                    <Box mt={3}>
                       <Typography variant="body1" color="textSecondary">
-                        No address
+                        Address: /
                       </Typography>
                     </Box>
                   )}
+
+                  <Box mt={3}>
+                    <Typography variant="body1" color="textSecondary">
+                      Employment date: {record.employmentDate?.toLocaleString() || '/'}
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary">
+                      Card identifier: {record.cardIdentifier || '/'}
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary">
+                      Time&Space identifier: {record.timeSpaceIdentifier || '/'}
+                    </Typography>
+                    <Typography variant="body1" color="textSecondary">
+                      Teamwork identifier: {record.teamworkIdentifier || '/'}
+                    </Typography>
+                  </Box>
                 </CardContent>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>

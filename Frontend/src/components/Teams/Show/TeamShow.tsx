@@ -5,6 +5,8 @@ import { ITeam } from '../../../types/ITeam';
 import InfoIcon from '@mui/icons-material/Info';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { useState } from 'react';
+import { OrganizationChart } from './OrganizationChart/OrganizationChart';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 export const TeamShow = () => (
   <ShowBase>
@@ -45,6 +47,7 @@ const TeamShowContent = () => {
                 textColor="primary"
               >
                 <Tab icon={<InfoIcon />} aria-label="person" />
+                <Tab icon={<AccountTreeIcon />} aria-label="tree" />
                 <Tab icon={<AnalyticsIcon />} aria-label="analytics" />
               </Tabs>
               <Divider />
@@ -59,6 +62,13 @@ const TeamShowContent = () => {
                 </CardContent>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
+                <CardContent>
+                  <div style={{ maxWidth: '350px' }}>
+                    <OrganizationChart record={record} />
+                  </div>
+                </CardContent>
+              </TabPanel>
+              <TabPanel value={tabValue} index={2}>
                 <CardContent>
                   <Typography variant="h5">Statistics</Typography>
                 </CardContent>
