@@ -17,6 +17,7 @@
     "react-admin-color-picker": "^1.0.3",
     "react-dom": "^18.2.0",
     "react-organizational-chart": "^2.2.1",
+    "recharts": "^2.12.7",
     "universal-cookie": "^7.1.4"
   },
   "devDependencies": {

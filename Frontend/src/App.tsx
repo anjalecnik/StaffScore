@@ -3,7 +3,7 @@ import { dataProvider } from './dataProvider';
 import UserIcon from '@mui/icons-material/Group';
 import GroupsIcon from '@mui/icons-material/Groups';
 import SellIcon from '@mui/icons-material/Sell';
-import { Dashboard } from './components/Dashboard';
+import { Dashboard } from './components/Dashboard/Dashboard';
 import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
 import { TeamList } from './components/Teams/List/Teams';
