@@ -17,6 +17,10 @@ import { TeamEdit } from './components/Teams/Edit/TeamEdit';
 import { TagList } from './components/Tags/List/Tags';
 import { TagCreate } from './components/Tags/Create/TagCreate';
 import { TagEdit } from './components/Tags/Edit/TagEdit';
+import { QuestionList } from './components/Questions/List/Questions';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import { QuestionCreate } from './components/Questions/Create/QuestionCreate';
+import { QuestionEdit } from './components/Questions/Edit/QuestionEdit';
 
 export default function App() {
   return (
@@ -53,6 +57,14 @@ export default function App() {
           edit={TagEdit}
           recordRepresentation="name"
           icon={SellIcon}
+        />
+        <Resource
+          name="questions"
+          list={QuestionList}
+          create={QuestionCreate}
+          edit={QuestionEdit}
+          recordRepresentation="name"
+          icon={QuestionMarkIcon}
         />
       </Admin>
     </>
