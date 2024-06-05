@@ -45,8 +45,12 @@ export const QuestionnaireEditForm = ({ initialState }: FormProps) => {
     setDialogOpen(false);
   };
 
-  const handleRemoveQuestion = (id: number | undefined) => {
-    setQuestions(questions.filter(q => q.id !== id));
+  const handleRemoveQuestion = (id: number | undefined, index: number) => {
+    if (id) {
+      setQuestions(questions.filter(q => q.id !== id));
+      return;
+    }
+    setQuestions(questions.filter((_, i) => i !== index));
   };
 
   const handleDialogOpen = () => {
@@ -86,7 +90,7 @@ export const QuestionnaireEditForm = ({ initialState }: FormProps) => {
               </Grid>
               <Grid item xs={2} sm={1}>
                 <IconButton
-                  onClick={() => handleRemoveQuestion(q.id)}
+                  onClick={() => handleRemoveQuestion(q.id, index)}
                   disabled={questions.length === 1}
                 >
                   <DeleteIcon />
@@ -157,7 +161,7 @@ export const QuestionnaireEditForm = ({ initialState }: FormProps) => {
               </Grid>
               <Grid item xs={2} sm={1}>
                 <IconButton
-                  onClick={() => handleRemoveQuestion(q?.id)}
+                  onClick={() => handleRemoveQuestion(q.id, index)}
                   disabled={questions.length === 1}
                 >
                   <DeleteIcon />
