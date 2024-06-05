@@ -16,9 +16,7 @@ import {
   endAt,
   Query,
   DocumentData,
-  Timestamp,
 } from "firebase/firestore";
-import { sendMail } from "../config/mailService";
 
 const router = Router();
 

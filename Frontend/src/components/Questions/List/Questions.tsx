@@ -26,7 +26,7 @@ export const QuestionList = () => {
 
       <List>
         <Datagrid rowClick="edit">
-          <TextField source="question" inputProps={{ maxLength: 12 }} />
+          <TextField source="question" />
           <CustomTypeIcon />
         </Datagrid>
       </List>

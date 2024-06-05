@@ -3,6 +3,8 @@ import { dataProvider } from './dataProvider';
 import UserIcon from '@mui/icons-material/Group';
 import GroupsIcon from '@mui/icons-material/Groups';
 import SellIcon from '@mui/icons-material/Sell';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { authProvider } from './authProvider';
 import { LoginPage } from './components/LoginPage';
@@ -18,9 +20,11 @@ import { TagList } from './components/Tags/List/Tags';
 import { TagCreate } from './components/Tags/Create/TagCreate';
 import { TagEdit } from './components/Tags/Edit/TagEdit';
 import { QuestionList } from './components/Questions/List/Questions';
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { QuestionCreate } from './components/Questions/Create/QuestionCreate';
 import { QuestionEdit } from './components/Questions/Edit/QuestionEdit';
+import { QuestionnaireList } from './components/Questionnaires/List/Questionnaires';
+import { QuestionnaireCreate } from './components/Questionnaires/Create/QuestionnaireCreate';
+import { QuestionnaireEdit } from './components/Questionnaires/Edit/QuestionnaireEdit';
 
 export default function App() {
   return (
@@ -57,6 +61,14 @@ export default function App() {
           edit={TagEdit}
           recordRepresentation="name"
           icon={SellIcon}
+        />
+        <Resource
+          name="questionnaires"
+          list={QuestionnaireList}
+          create={QuestionnaireCreate}
+          edit={QuestionnaireEdit}
+          recordRepresentation="name"
+          icon={AssignmentIcon}
         />
         <Resource
           name="questions"
