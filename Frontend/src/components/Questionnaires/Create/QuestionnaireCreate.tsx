@@ -1,18 +1,18 @@
 import { Create, Form, Toolbar } from 'react-admin';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { CardContent, Stack, Avatar, Box } from '@mui/material';
-import SellIcon from '@mui/icons-material/Sell';
-import { TagForm } from './TagForm';
+import { QuestionnaireForm } from './QuestionnaireForm';
 
-export const TagCreate = () => (
+export const QuestionnaireCreate = () => (
   <Create actions={false} redirect="list">
     <Form>
       <CardContent>
         <Stack direction="row">
           <Avatar sx={{ mt: 1 }}>
-            <SellIcon />
+            <AssignmentIcon />
           </Avatar>
           <Box ml={2} flex="1" maxWidth={796}>
-            <TagForm />
+            <QuestionnaireForm />
           </Box>
         </Stack>
       </CardContent>

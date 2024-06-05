@@ -15,6 +15,7 @@ import {
   endAt,
   Query,
   DocumentData,
+  deleteDoc,
 } from "firebase/firestore";
 
 const router = Router();
@@ -144,6 +145,27 @@ router.put("/:tagId", async (req, res) => {
     res.status(200).json(updatedTagData);
   } catch (error) {
     console.error("Error updating tag:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** DELETE tag */
+router.delete("/:tagId", async (req, res) => {
+  const { tagId } = req.params;
+
+  try {
+    const tagDocRef = doc(db, "tags", tagId);
+    const tagDocSnapshot = await getDoc(tagDocRef);
+
+    if (!tagDocSnapshot.exists()) {
+      return res.status(404).json({ error: "Tag not found" });
+    }
+
+    await deleteDoc(tagDocRef);
+
+    res.status(200).json([]);
+  } catch (error) {
+    console.error("Error deleting tag:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
