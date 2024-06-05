@@ -18,7 +18,7 @@ interface OrgChartProps {
 
 export const OrganizationChart = ({ record }: OrgChartProps) => {
   return (
-    <Tree key={record.teamLeader.id} label={<CardTemplate user={record.teamLeader} />}>
+    <Tree label={<CardTemplate user={record.teamLeader} />}>
       {record.members.map(member => (
         <TreeNode key={member.id} label={<CardTemplate user={member} />} />
       ))}
@@ -42,7 +42,7 @@ const CardTemplate = ({ user }: CardTemplateProps) => {
   };
 
   return (
-    <Card>
+    <Card key={user.id}>
       <CardContent>
         <Box display="flex" justifyContent="center">
           <Avatar src={user?.photoUrl} />

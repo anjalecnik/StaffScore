@@ -1,12 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ShowBase, useShowContext, EditButton } from 'react-admin';
-import { Box, Card, CardContent, Typography, Tabs, Tab, Divider } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Tabs,
+  Tab,
+  Divider,
+  useMediaQuery,
+  Theme
+} from '@mui/material';
 import { ITeam } from '../../../types/ITeam';
 import InfoIcon from '@mui/icons-material/Info';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OrganizationChart } from './OrganizationChart/OrganizationChart';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import Alert from '@mui/material/Alert';
+import { BasicInformation } from './BasicInformation';
+import { StatisticsChart } from './StatisticsChart/StatisticsChart';
 
 export const TeamShow = () => (
   <ShowBase>
@@ -15,9 +28,28 @@ export const TeamShow = () => (
 );
 
 const TeamShowContent = () => {
+  const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
+  const [isLandscape, setIsLandscape] = useState(
+    window.matchMedia('(orientation: landscape)').matches
+  );
+
   const [tabValue, setTabValue] = useState(0);
 
   const { record } = useShowContext<ITeam>();
+
+  useEffect(() => {
+    const handleOrientationChange = (e: any) => {
+      setIsLandscape(e.matches);
+    };
+
+    const mediaQueryList = window.matchMedia('(orientation: landscape)');
+    mediaQueryList.addListener(handleOrientationChange);
+
+    return () => {
+      mediaQueryList.removeListener(handleOrientationChange);
+    };
+  }, []);
+
   if (!record) return null;
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -53,24 +85,29 @@ const TeamShowContent = () => {
               <Divider />
               <TabPanel value={tabValue} index={0}>
                 <CardContent>
-                  <Typography variant="body1" component="div" gutterBottom>
-                    {record.name}
-                  </Typography>
-                  <Typography variant="body1" color="textSecondary">
-                    {record.description}
-                  </Typography>
+                  <BasicInformation />
                 </CardContent>
               </TabPanel>
               <TabPanel value={tabValue} index={1}>
                 <CardContent>
-                  <div style={{ maxWidth: '350px' }}>
-                    <OrganizationChart record={record} />
-                  </div>
+                  {!isSmall || (isSmall && isLandscape) ? (
+                    <div style={{ maxWidth: '350px' }}>
+                      <OrganizationChart record={record} />
+                    </div>
+                  ) : (
+                    <Alert severity="warning">Rotate your device to view hierarchy.</Alert>
+                  )}
                 </CardContent>
               </TabPanel>
               <TabPanel value={tabValue} index={2}>
                 <CardContent>
-                  <Typography variant="h5">Statistics</Typography>
+                  {!isSmall || (isSmall && isLandscape) ? (
+                    <div>
+                      <StatisticsChart data={record?.statistics} />
+                    </div>
+                  ) : (
+                    <Alert severity="warning">Rotate your device to view statistics.</Alert>
+                  )}
                 </CardContent>
               </TabPanel>
             </CardContent>

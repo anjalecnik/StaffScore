@@ -1,6 +1,6 @@
 import { useRecordContext } from 'react-admin';
 import { Chip, Box, Typography } from '@mui/material';
-import { IUser } from '../../../types/IUser';
+import { IUser } from '../../../../types/IUser';
 
 export const TagsIterator = () => {
   const record = useRecordContext<IUser>();

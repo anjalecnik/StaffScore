@@ -17,6 +17,7 @@ import {
   endAt,
   DocumentData,
   Query,
+  Timestamp,
 } from "firebase/firestore";
 
 const router = Router();
@@ -76,6 +77,22 @@ export interface IUser {
   phoneNumber: string;
 }
 
+export interface IStatistic {
+  date: Timestamp;
+  evaluation: number;
+  questionnaireId: number;
+}
+
+interface Statistic {
+  date: Timestamp;
+  [user: string]: number | Timestamp;
+}
+
+interface AggregatedStatistic {
+  name: string;
+  [user: string]: number | string;
+}
+
 /** GET by document id */
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -89,6 +106,7 @@ router.get("/:id", async (req, res) => {
       const teamDoc = querySnapshot.docs[0];
       const teamData = teamDoc.data();
 
+      let allStatistics: Statistic[] = [];
       if (teamData.members && Array.isArray(teamData.members)) {
         const teamPromises = teamData.members.map(async (memberRef) => {
           const trimmedMemberId = memberRef.id.trim();
@@ -97,6 +115,29 @@ router.get("/:id", async (req, res) => {
           const memberSnap = await getDoc(trimmedMemberRef);
           if (memberSnap.exists()) {
             const memberData = memberSnap.data() as IUser;
+
+            const statisticsQuery = query(
+              collection(db, "statistics"),
+              where("user", "==", trimmedMemberRef)
+            );
+            const statisticsSnapshot = await getDocs(statisticsQuery);
+
+            const statistics: IStatistic[] = statisticsSnapshot.docs.map(
+              (doc) => ({
+                id: doc.id,
+                evaluation: doc.data().evaluation,
+                questionnaireId: doc.data().questionnaire.id,
+                date: doc.data().timestamp,
+              })
+            );
+
+            statistics.forEach((stat) => {
+              allStatistics.push({
+                date: stat.date,
+                [memberData.displayName]: stat.evaluation,
+              });
+            });
+
             return { id: memberSnap.id, ...memberData };
           } else {
             console.log(`No user (member) found with the id: ${memberRef.id}`);
@@ -109,6 +150,92 @@ router.get("/:id", async (req, res) => {
         );
 
         teamData.members = membersArray;
+
+        // Map statistics data into correct form
+        const groupByQuarter = (date: Date) => {
+          const year = date.getFullYear();
+          const month = date.getMonth();
+          const quarter = Math.floor(month / 3) + 1;
+          return `${year}-Q${quarter}`;
+        };
+
+        const aggregateStatistics = (
+          allStatistics: Statistic[]
+        ): AggregatedStatistic[] => {
+          const aggregated: {
+            [quarter: string]: {
+              [user: string]: { sum: number; count: number };
+            };
+          } = {};
+
+          allStatistics.forEach((stat) => {
+            const date = stat.date.toDate();
+            const quarter = groupByQuarter(date);
+
+            if (!aggregated[quarter]) {
+              aggregated[quarter] = {};
+            }
+
+            Object.keys(stat).forEach((key) => {
+              if (key !== "date") {
+                if (!aggregated[quarter][key]) {
+                  aggregated[quarter][key] = { sum: 0, count: 0 };
+                }
+                aggregated[quarter][key].sum += stat[key] as number;
+                aggregated[quarter][key].count++;
+              }
+            });
+          });
+
+          // Fill missing user data with default values
+          const allUsers = new Set<string>();
+          allStatistics.forEach((stat) => {
+            Object.keys(stat).forEach((key) => {
+              if (key !== "date") {
+                allUsers.add(key);
+              }
+            });
+          });
+
+          Array.from(allUsers).forEach((user) => {
+            for (const quarter in aggregated) {
+              if (!aggregated[quarter][user]) {
+                aggregated[quarter][user] = { sum: 0, count: 0 };
+              }
+            }
+          });
+
+          const formattedAggregated: AggregatedStatistic[] = [];
+
+          for (const quarter in aggregated) {
+            const aggregatedQuarter = aggregated[quarter];
+            const averageAggregatedQuarter: AggregatedStatistic = {
+              name: quarter,
+            };
+
+            for (const user in aggregatedQuarter) {
+              const { sum, count } = aggregatedQuarter[user];
+              averageAggregatedQuarter[user] = sum / count;
+            }
+
+            formattedAggregated.push(averageAggregatedQuarter);
+          }
+
+          const sortQuarterName = (quarterName: string): number => {
+            const parts = quarterName.split("-Q");
+            const year = parseInt(parts[0], 10);
+            const quarter = parseInt(parts[1], 10);
+            return year * 10 + quarter;
+          };
+
+          return formattedAggregated.sort((a, b) => {
+            const dateA = sortQuarterName(a.name);
+            const dateB = sortQuarterName(b.name);
+            return dateA - dateB;
+          });
+        };
+
+        teamData.statistics = aggregateStatistics(allStatistics);
       }
 
       if (teamData.teamLeader) {
@@ -133,6 +260,7 @@ router.get("/:id", async (req, res) => {
         teamLeader_id?: string;
         members?: IUser[];
         members_ids?: string[];
+        allStatistics?: any[];
         [key: string]: any;
       } = {
         id: teamDoc.id,
