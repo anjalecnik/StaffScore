@@ -21,4 +21,5 @@ export interface IUser {
   teams: ITeam[];
   statistics: IStatistic[];
   averageEvaluation: number;
+  pdfs?: { name: string; url: string }[];
 }

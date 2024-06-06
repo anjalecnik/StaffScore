@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db } from "../config/firebase";
+import { db, storage } from "../config/firebase";
 import {
   getDocs,
   collection,
@@ -17,6 +17,9 @@ import {
   Query,
   DocumentData,
 } from "firebase/firestore";
+import PDFDocument from "pdfkit";
+import { ref, uploadBytes } from "firebase/storage";
+import path from "path";
 
 const router = Router();
 
@@ -401,6 +404,21 @@ router.post("/solve", async (req, res) => {
           user: doc(db, "users", userId),
         });
 
+        const userSnap = await getDoc(doc(db, "users", userId));
+        let userData = { id: userId, name: "" };
+        if (userSnap.exists()) {
+          userData.name = userSnap.data().displayName;
+        }
+
+        await createAndSavePDF(
+          formattedQuestionnaire,
+          questionnaireData.name,
+          newEvaluationRef.id,
+          userData,
+          formValues,
+          evaluation
+        );
+
         res.json(newEvaluationRef);
       } else {
         res.status(404).json({
@@ -461,6 +479,107 @@ const calculateEvaluation = (
 
   return 0;
 };
+
+const createAndSavePDF = async (
+  questionnaire: any,
+  questionnaireData: string,
+  evaluationId: string,
+  userData: { id: string; name: string },
+  formValues: any,
+  score: number
+) => {
+  const logoPath = path.resolve(__dirname, "../assets/logo.png");
+  const fontRegularPath = path.resolve(
+    __dirname,
+    "../fonts/NotoSansJP-Regular.otf"
+  );
+  const fontLightPath = path.resolve(
+    __dirname,
+    "../fonts/NotoSansJP-Light.otf"
+  );
+
+  const answerMapping: { [key: string]: string } = {
+    "1": "Strongly Disagree",
+    "2": "Disagree",
+    "3": "Neutral",
+    "4": "Agree",
+    "5": "Strongly Agree",
+    yes: "Yes",
+    no: "No",
+  };
+
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  const hours = String(currentDate.getHours()).padStart(2, "0");
+  const minutes = String(currentDate.getMinutes()).padStart(2, "0");
+  const currentTime = `${year}-${month}-${day}-${hours}-${minutes}`;
+
+  const doc = new PDFDocument();
+  const buffers: any[] = [];
+
+  doc.on("data", buffers.push.bind(buffers));
+  doc.on("end", async () => {
+    const pdfData = Buffer.concat(buffers);
+    const storageRef = ref(
+      storage,
+      `users/${userData.id}/evaluations/${userData.name}-${currentTime}.pdf`
+    );
+    await uploadBytes(storageRef, pdfData);
+    console.log("PDF uploaded to Firebase Storage successfully");
+  });
+
+  doc.image(logoPath, doc.page.width / 2 - 70 / 2, 60, {
+    fit: [70, 140],
+    align: "center",
+  });
+  jumpLine(doc, 3);
+  doc.fontSize(20).text("Questionnaire Evaluation", { align: "center" });
+  doc.moveDown();
+
+  doc
+    .font(fontLightPath)
+    .fontSize(10)
+    .fill("#021c27")
+    .text(`Evaluation ID: ${evaluationId}`, {
+      align: "center",
+    });
+  jumpLine(doc, 2);
+  doc
+    .font(fontRegularPath)
+    .fontSize(16)
+    .fill("#021c27")
+    .text(userData.name.length ? userData.name : userData.id, {
+      align: "center",
+    });
+
+  jumpLine(doc, 1);
+  doc.fontSize(14).text(`Questionnaire: ${questionnaireData}`);
+  doc.moveDown();
+
+  questionnaire.questions.forEach((question: Question, index: number) => {
+    const answerKey = formValues[question.id];
+    const answer = answerMapping[answerKey] || "No answer provided";
+    doc.fontSize(12).text(`Question ${index + 1}: ${question.question}`);
+    jumpLine(doc, 1);
+    doc.fontSize(12).text(`Answer: ${answer}`);
+    doc.moveDown();
+  });
+
+  jumpLine(doc, 2);
+  doc.fontSize(12).text(`Score: ${score}/1`, {
+    align: "right",
+  });
+
+  doc.end();
+};
+
+function jumpLine(doc: typeof PDFDocument, lines: number) {
+  for (let index = 0; index < lines; index++) {
+    doc.moveDown();
+  }
+}
 
 /** DELETE questionnaire */
 router.delete("/:questionnaireId", async (req, res) => {

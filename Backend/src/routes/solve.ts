@@ -69,8 +69,6 @@ router.get("/", async (req, res) => {
               ...questionnaireData,
             };
 
-            console.log(formattedUser);
-
             res.json(formattedUser);
           }
         }
