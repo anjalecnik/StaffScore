@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db } from "../config/firebase";
+import { db, storage } from "../config/firebase";
 import {
   getDocs,
   collection,
@@ -16,9 +16,9 @@ import {
   endAt,
   Query,
   DocumentData,
-  Timestamp,
 } from "firebase/firestore";
 import { sendMail } from "../config/mailService";
+import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 
 const router = Router();
 
@@ -109,6 +109,21 @@ router.get("/:id", async (req, res) => {
     if (!querySnapshot.empty) {
       const userDoc = querySnapshot.docs[0];
       const userData = userDoc.data();
+
+      const storageRef = ref(storage, `users/${id}/evaluations`);
+      const listResult = await listAll(storageRef);
+
+      const pdfUrls = await Promise.all(
+        listResult.items.map(async (itemRef) => {
+          const url = await getDownloadURL(itemRef);
+          return {
+            name: itemRef.name,
+            url,
+          };
+        })
+      );
+
+      userData.pdfs = pdfUrls;
 
       const statisticsSnapshot = await getDocs(
         query(
@@ -227,6 +242,7 @@ router.get("/:id", async (req, res) => {
           tags_ids?: string[];
           statistics?: any[];
           averageEvaluation?: number;
+          pdfs?: { name: string; url: string };
           [key: string]: any;
         } = {
           id: userDoc.id,

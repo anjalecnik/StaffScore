@@ -21,6 +21,8 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { BasicInformation } from './BasicInformation';
 import { StatisticsChart } from './StatisticsChart/StatisticsChart';
 import Alert from '@mui/material/Alert';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import Button from '@mui/material/Button';
 
 export const UserShow = () => (
   <ShowBase>
@@ -100,6 +102,7 @@ const UserShowContent = () => {
               >
                 <Tab icon={<BadgeIcon />} aria-label="person" />
                 <Tab icon={<AnalyticsIcon />} aria-label="analytics" />
+                <Tab icon={<SummarizeIcon />} aria-label="reports" />
               </Tabs>
               <Divider />
               <TabPanel value={tabValue} index={0}>
@@ -116,6 +119,11 @@ const UserShowContent = () => {
                   ) : (
                     <Alert severity="warning">Rotate your device to view statistics.</Alert>
                   )}
+                </CardContent>
+              </TabPanel>
+              <TabPanel value={tabValue} index={2}>
+                <CardContent>
+                  {record.pdfs && <OpenInNewTabButton pdfs={record.pdfs} />}
                 </CardContent>
               </TabPanel>
             </CardContent>
@@ -146,5 +154,31 @@ const TabPanel = (props: TabPanelProps) => {
     >
       {children}
     </div>
+  );
+};
+
+interface PdfProps {
+  pdfs: { name: string; url: string }[];
+}
+
+const OpenInNewTabButton = ({ pdfs }: PdfProps) => {
+  const sortedPDFs = [...pdfs].sort((a, b) => b.name.localeCompare(a.name));
+
+  return (
+    <>
+      {sortedPDFs.map((pdf, index) => (
+        <div key={index} style={{ marginBottom: '10px' }}>
+          <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={() => window.open(pdf.url, '_blank')}
+            style={{ width: 'fit-content' }}
+          >
+            {pdf.name}
+          </Button>
+        </div>
+      ))}
+    </>
   );
 };
