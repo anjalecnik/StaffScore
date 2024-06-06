@@ -51,7 +51,7 @@ const fetchQuestionnaires = async (): Promise<IQuestionnaire[]> => {
 
 export const OrganizationChart = ({ record }: OrgChartProps) => {
   return (
-    <Tree label={<CardTemplate user={record.teamLeader} />}>
+    <Tree label={<CardTemplate user={record.teamLeader} isTeamLeader={true} />}>
       {record.members.map(member => (
         <TreeNode key={member.id} label={<CardTemplate user={member} />} />
       ))}
@@ -61,9 +61,10 @@ export const OrganizationChart = ({ record }: OrgChartProps) => {
 
 interface CardTemplateProps {
   user: IUser;
+  isTeamLeader?: boolean;
 }
 
-const CardTemplate = ({ user }: CardTemplateProps) => {
+const CardTemplate = ({ user, isTeamLeader = false }: CardTemplateProps) => {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -96,7 +97,9 @@ const CardTemplate = ({ user }: CardTemplateProps) => {
       <CardActions>
         <Box display="flex" justifyContent="center" width="100%">
           <Button startIcon={<AssignmentIndIcon />} onClick={handleShowButtonClick} />
-          <Button startIcon={<QuizIcon />} onClick={handleQuestionnaireButtonClick} />
+          {!isTeamLeader && (
+            <Button startIcon={<QuizIcon />} onClick={handleQuestionnaireButtonClick} />
+          )}
         </Box>
       </CardActions>
       {dialogOpen && (

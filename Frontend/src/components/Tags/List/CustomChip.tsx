@@ -9,7 +9,7 @@ export const CustomChip = () => {
     <Chip
       variant="outlined"
       label={record.name}
-      style={{ backgroundColor: record.color, border: 0 }}
+      style={{ backgroundColor: record.color || '#E8E8E8', border: 0 }}
     />
   );
 };
