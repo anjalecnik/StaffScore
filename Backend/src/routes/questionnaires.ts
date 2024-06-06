@@ -118,6 +118,68 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+/** GET by document id for solve */
+router.get("/solve/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const questionnaireRef = collection(db, "questionnaires");
+    const q = query(questionnaireRef, where("__name__", "==", id));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const questionnaireDoc = querySnapshot.docs[0];
+      const questionnaireData = questionnaireDoc.data();
+
+      let formattedQuestionnaire = {
+        id: questionnaireDoc.id,
+        ...questionnaireData,
+      };
+
+      if (
+        questionnaireData.questions &&
+        Array.isArray(questionnaireData.questions)
+      ) {
+        const questionPromises = questionnaireData.questions.map(
+          async (questionRef) => {
+            const trimmedQuestionId = questionRef.id.trim();
+            const trimmedQuestionRef = doc(db, "questions", trimmedQuestionId);
+
+            const questionSnap = await getDoc(trimmedQuestionRef);
+            if (questionSnap.exists()) {
+              const questionData = questionSnap.data() as IQuestion;
+              return { id: questionSnap.id, ...questionData };
+            } else {
+              console.log(`No question found with the id: ${questionRef.id}`);
+              return null;
+            }
+          }
+        );
+
+        const questionsArray = (await Promise.all(questionPromises)).filter(
+          (question) => question !== null
+        );
+
+        questionnaireData.questions = questionsArray;
+
+        formattedQuestionnaire = {
+          id: questionnaireDoc.id,
+          ...questionnaireData,
+        };
+      }
+
+      res.json(formattedQuestionnaire);
+    } else {
+      res
+        .status(404)
+        .json({ message: "No questionnaire found with the id: " + id });
+    }
+  } catch (error) {
+    console.error("Error getting questionnaire by id:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 /** CREATE new questionnaire */
 router.post("/", async (req, res) => {
   const { name, questions } = req.body;
@@ -262,6 +324,143 @@ router.put("/:questionnaireId", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+/** SOLVE questionnaire */
+router.post("/solve", async (req, res) => {
+  const { formValues, questionnaireId, userId } = req.body;
+  try {
+    try {
+      const questionnaireRef = collection(db, "questionnaires");
+      const q = query(
+        questionnaireRef,
+        where("__name__", "==", questionnaireId)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const questionnaireDoc = querySnapshot.docs[0];
+        const questionnaireData = questionnaireDoc.data();
+
+        let formattedQuestionnaire: any = {
+          id: questionnaireDoc.id,
+          ...questionnaireData,
+        };
+
+        if (
+          questionnaireData.questions &&
+          Array.isArray(questionnaireData.questions)
+        ) {
+          const questionPromises = questionnaireData.questions.map(
+            async (questionRef: { id: string }) => {
+              const trimmedQuestionId = questionRef.id.trim();
+              const trimmedQuestionRef = doc(
+                db,
+                "questions",
+                trimmedQuestionId
+              );
+
+              const questionSnap = await getDoc(trimmedQuestionRef);
+              if (questionSnap.exists()) {
+                const questionData = questionSnap.data() as IQuestion;
+                return { id: questionSnap.id, ...questionData };
+              } else {
+                console.log(`No question found with the id: ${questionRef.id}`);
+                return null;
+              }
+            }
+          );
+
+          const questionsArray = (await Promise.all(questionPromises)).filter(
+            (question) => question !== null
+          );
+
+          questionnaireData.questions = questionsArray;
+
+          formattedQuestionnaire = {
+            id: questionnaireDoc.id,
+            ...questionnaireData,
+          };
+        }
+
+        let evaluation = 0;
+        const questionWeights = questionnaireData.questionWeights;
+        formattedQuestionnaire.questions.forEach((question: ICalcQuestion) => {
+          evaluation += calculateEvaluation(
+            question,
+            formValues,
+            questionWeights
+          );
+        });
+
+        const timestamp = serverTimestamp();
+
+        const newEvaluationRef = await addDoc(collection(db, "statistics"), {
+          evaluation,
+          questionnaire: questionnaireId,
+          timestamp,
+          user: userId,
+        });
+
+        res.json(newEvaluationRef);
+      } else {
+        res.status(404).json({
+          message: "No questionnaire found with the id: " + questionnaireId,
+        });
+      }
+    } catch (error) {
+      console.error("Error getting questionnaire by id:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+
+    res.status(201).json();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+interface ICalcQuestion {
+  id: string;
+  lastModified: any;
+  optimalResponse: string;
+  type: "binary" | "rating";
+  question: string;
+}
+
+const calculateEvaluation = (
+  question: ICalcQuestion,
+  formValues: Record<string, string>,
+  questionWeights: Record<string, number>
+): number => {
+  const { id, optimalResponse } = question;
+  const formResponse = formValues[id];
+
+  if (question.type === "binary" && formResponse === optimalResponse) {
+    return questionWeights[id];
+  }
+
+  if (question.type === "rating") {
+    const optimal = parseInt(optimalResponse);
+    const response = parseInt(formResponse);
+    const weight = questionWeights[id];
+
+    if (
+      !isNaN(optimal) &&
+      !isNaN(response) &&
+      optimal >= 1 &&
+      optimal <= 5 &&
+      response >= 1 &&
+      response <= 5
+    ) {
+      const difference = Math.abs(optimal - response);
+      const percentage = 1 - difference / 4;
+      const weightedPercentage = percentage * weight;
+      return Math.min(weightedPercentage, 1);
+    }
+  }
+
+  return 0;
+};
 
 /** DELETE questionnaire */
 router.delete("/:questionnaireId", async (req, res) => {
