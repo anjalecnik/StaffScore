@@ -35,7 +35,7 @@ export const UserList = () => {
           />
         ) : (
           <Datagrid rowClick="show">
-            <CustomAvatar size="small" />
+            <CustomAvatar />
             <TextField source="displayName" />
             <TextField source="email" />
           </Datagrid>

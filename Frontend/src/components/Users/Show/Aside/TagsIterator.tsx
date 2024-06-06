@@ -23,7 +23,7 @@ export const TagsIterator = () => {
             size="small"
             variant="outlined"
             label={tag.name}
-            style={{ backgroundColor: tag.color, border: 0 }}
+            style={{ backgroundColor: tag.color || '#E8E8E8', border: 0 }}
             key={tag.id}
           />
         </Box>

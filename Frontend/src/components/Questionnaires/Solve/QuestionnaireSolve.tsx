@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { EditButton, Button, useNotify } from 'react-admin';
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Button, useNotify } from 'react-admin';
+import { Box, Card, CardContent, Typography, Toolbar, Stack, Avatar, Divider } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -10,7 +10,9 @@ import { useEffect, useState } from 'react';
 import { API_URL } from '../../../dataProvider';
 import { IQuestion } from '../../../types/IQuestion';
 import { Alert } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
 import './../../../assets/questionnaireSolve.css';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 
 interface Questionnaire {
   id: string;
@@ -66,6 +68,10 @@ interface QuestionnaireSolveProps {
   userId: string;
 }
 
+interface AnsweredQuestions {
+  [questionId: string]: boolean;
+}
+
 const QuestionnaireSolveContent = ({
   questionnaire,
   questionnaireId,
@@ -73,6 +79,8 @@ const QuestionnaireSolveContent = ({
 }: QuestionnaireSolveProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [formValues, setFormValues] = useState<any>({});
+  const [answeredQuestions, setAnsweredQuestions] = useState<AnsweredQuestions>({});
+
   if (!questionnaire) return null;
 
   const notify = useNotify();
@@ -84,6 +92,13 @@ const QuestionnaireSolveContent = ({
       ...prevValues,
       [questionId]: value
     }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setAnsweredQuestions((prevAnswers: any) => ({
+      ...prevAnswers,
+      [questionId]: true
+    }));
+
+    console.log(formValues);
   };
 
   const handleSubmit = async () => {
@@ -115,36 +130,58 @@ const QuestionnaireSolveContent = ({
     <>
       <Box mt={2} display="flex">
         <Box flex="1">
-          <Card>
+          <Card
+            sx={{
+              borderBottomLeftRadius: '0',
+              WebkitBorderBottomRightRadius: '0',
+              borderTopColor: '#FFFFFF'
+            }}
+          >
             <CardContent>
               <Box display="flex">
                 <Box ml={2} flex="1">
                   <Typography variant="h5">{questionnaire.name}</Typography>
                 </Box>
-                <Box>
-                  <EditButton label="Edit Questionnaire" />
-                </Box>
               </Box>
+              <Divider sx={{ mt: 2, width: '796px' }} />
             </CardContent>
             <CardContent>
-              <Box ml={2} flex="1" sx={{ maxWidth: '500px' }}>
-                {questionnaire.questions.map((question, index) => (
-                  <Question
-                    key={index}
-                    question={question}
-                    onFormControlChange={onFormControlChange}
-                  />
-                ))}
-              </Box>
-              <Button
-                onClick={handleSubmit}
-                type="submit"
-                label="Submit"
-                variant="contained"
-                sx={{ marginTop: '15px', marginLeft: '15px' }}
-              />
+              <Stack direction="row">
+                <Avatar sx={{ mt: 2, ml: 2 }}>
+                  <SummarizeIcon />
+                </Avatar>
+                <Box ml={2} flex="1" maxWidth={796}>
+                  <Box ml={2} flex="1" sx={{ maxWidth: '500px' }}>
+                    {questionnaire.questions.map((question, index) => (
+                      <Question
+                        key={index}
+                        question={question}
+                        onFormControlChange={onFormControlChange}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              </Stack>
             </CardContent>
           </Card>
+          <Toolbar className="custom-toolbar">
+            <Button
+              onClick={handleSubmit}
+              type="submit"
+              label="Save"
+              variant="contained"
+              sx={{
+                fontWeight: '500',
+                fontSize: '0.875rem',
+                lineHeight: '1.75',
+                letterSpacing: '0.02857em',
+                minWidth: '64px',
+                padding: '6px 16px'
+              }}
+              startIcon={<SaveIcon />}
+              disabled={!questionnaire.questions.every(question => answeredQuestions[question.id])}
+            />
+          </Toolbar>
         </Box>
       </Box>
     </>
@@ -194,7 +231,7 @@ const BinaryQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Yes"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#D0D2D4',
+            backgroundColor: '#F5F5F5',
             marginLeft: '5px',
             marginTop: '2px',
             paddingRight: '15px',
@@ -208,7 +245,7 @@ const BinaryQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="No"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#D0D2D4',
+            backgroundColor: '#F5F5F5',
             marginLeft: '5px',
             marginTop: '2px',
             paddingRight: '15px',
@@ -246,7 +283,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Strongly Disagree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#D0D2D4',
+            backgroundColor: '#F5F5F5',
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px',
@@ -259,7 +296,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Disagree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#D0D2D4',
+            backgroundColor: '#F5F5F5',
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
@@ -271,7 +308,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Neutral"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#D0D2D4',
+            backgroundColor: '#F5F5F5',
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
@@ -283,7 +320,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Agree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#D0D2D4',
+            backgroundColor: '#F5F5F5',
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
@@ -295,7 +332,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Strongly Agree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#D0D2D4',
+            backgroundColor: '#F5F5F5',
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
