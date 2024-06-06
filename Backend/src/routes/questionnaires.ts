@@ -396,9 +396,9 @@ router.post("/solve", async (req, res) => {
 
         const newEvaluationRef = await addDoc(collection(db, "statistics"), {
           evaluation,
-          questionnaire: questionnaireId,
+          questionnaire: doc(db, "questionnaires", questionnaireId),
           timestamp,
-          user: userId,
+          user: doc(db, "users", userId),
         });
 
         res.json(newEvaluationRef);
