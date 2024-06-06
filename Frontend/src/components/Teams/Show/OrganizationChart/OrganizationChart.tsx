@@ -1,20 +1,53 @@
+import { useState } from 'react';
 import { Tree, TreeNode } from 'react-organizational-chart';
-import { ITeam } from '../../../../types/ITeam';
-import { Avatar } from '@mui/material';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { IUser } from '../../../../types/IUser';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import {
+  Avatar,
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  Button,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText
+} from '@mui/material';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import QuizIcon from '@mui/icons-material/Quiz';
+import { API_URL } from '../../../../dataProvider';
+import { ITeam } from '../../../../types/ITeam';
+import { IUser } from '../../../../types/IUser';
+import { IQuestion } from '../../../../types/IQuestion';
 
 interface OrgChartProps {
   record: ITeam;
 }
+
+export interface IQuestionnaire {
+  id: string;
+  name: string;
+  lastModified: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  questionWeights: Record<string, number>;
+  questions: string[] | IQuestion[];
+}
+
+const fetchQuestionnaires = async (): Promise<IQuestionnaire[]> => {
+  const response = await fetch(`${API_URL}/questionnaires`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  const data = await response.json();
+  return data.data;
+};
 
 export const OrganizationChart = ({ record }: OrgChartProps) => {
   return (
@@ -32,13 +65,19 @@ interface CardTemplateProps {
 
 const CardTemplate = ({ user }: CardTemplateProps) => {
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleShowButtonClick = () => {
     navigate(`/users/${user.id}/show`);
   };
 
   const handleQuestionnaireButtonClick = () => {
-    //TODO: navigate to questionnaire
+    setDialogOpen(true);
+  };
+
+  const handleQuestionnaireSelect = (questionnaireId: string) => {
+    setDialogOpen(false);
+    navigate(`/solve/${questionnaireId}/user/${user.id}`);
   };
 
   return (
@@ -60,6 +99,46 @@ const CardTemplate = ({ user }: CardTemplateProps) => {
           <Button startIcon={<QuizIcon />} onClick={handleQuestionnaireButtonClick} />
         </Box>
       </CardActions>
+      {dialogOpen && (
+        <QuestionnaireDialog
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          onSelect={handleQuestionnaireSelect}
+        />
+      )}
     </Card>
+  );
+};
+
+interface QuestionnaireDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSelect: (questionnaireId: string) => void;
+}
+
+const QuestionnaireDialog = ({ open, onClose, onSelect }: QuestionnaireDialogProps) => {
+  const { data, error, isLoading } = useQuery('questionnaires', fetchQuestionnaires, {
+    enabled: open
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading questionnaires</div>;
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Select a Questionnaire</DialogTitle>
+      <DialogContent>
+        <List>
+          {data?.map(questionnaire => (
+            <ListItem button key={questionnaire.id} onClick={() => onSelect(questionnaire.id)}>
+              <ListItemText primary={questionnaire.name} />
+            </ListItem>
+          ))}
+        </List>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+      </DialogActions>
+    </Dialog>
   );
 };

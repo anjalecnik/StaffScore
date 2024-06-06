@@ -1,4 +1,4 @@
-import { Admin, Resource } from 'react-admin';
+import { Admin, Resource, CustomRoutes } from 'react-admin';
 import { dataProvider } from './dataProvider';
 import UserIcon from '@mui/icons-material/Group';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -25,6 +25,8 @@ import { QuestionEdit } from './components/Questions/Edit/QuestionEdit';
 import { QuestionnaireList } from './components/Questionnaires/List/Questionnaires';
 import { QuestionnaireCreate } from './components/Questionnaires/Create/QuestionnaireCreate';
 import { QuestionnaireEdit } from './components/Questionnaires/Edit/QuestionnaireEdit';
+import { Route } from 'react-router-dom';
+import { QuestionnaireSolve } from './components/Questionnaires/Solve/QuestionnaireSolve';
 
 export default function App() {
   return (
@@ -78,6 +80,9 @@ export default function App() {
           recordRepresentation="name"
           icon={QuestionMarkIcon}
         />
+        <CustomRoutes>
+          <Route path="/solve/:questionnaireId/user/:userId" element={<QuestionnaireSolve />} />
+        </CustomRoutes>
       </Admin>
     </>
   );
