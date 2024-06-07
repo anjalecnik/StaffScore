@@ -97,8 +97,6 @@ const QuestionnaireSolveContent = ({
       ...prevAnswers,
       [questionId]: true
     }));
-
-    console.log(formValues);
   };
 
   const handleSubmit = async () => {

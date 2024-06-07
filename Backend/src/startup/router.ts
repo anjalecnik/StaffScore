@@ -5,19 +5,13 @@ import usersRouter from "../routes/users";
 import tagsRouter from "../routes/tags";
 import questionsRouter from "../routes/questions";
 import questionnairesRouter from "../routes/questionnaires";
-import solveRouter from "../routes/solve";
 
 const routerSetup = (app: Express) => {
-  app.get("/", async (req: Request, res: Response) => {
-    res.send("Hello Express APIvantage!");
-  });
-
   app.use("/api/users", loginRouter);
   app.use("/api/teams", teamsRouter);
   app.use("/api/users", usersRouter);
   app.use("/api/tags", tagsRouter);
   app.use("/api/questions", questionsRouter);
   app.use("/api/questionnaires", questionnairesRouter);
-  app.use("/api/solve", solveRouter);
 };
 export default routerSetup;
