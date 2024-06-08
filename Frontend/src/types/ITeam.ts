@@ -11,4 +11,5 @@ export interface ITeam {
   members: IUser[];
   members_ids: Identifier[];
   statistics: IStatistic[];
+  averageEvaluation: number;
 }
