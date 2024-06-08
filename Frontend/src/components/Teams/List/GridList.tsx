@@ -39,7 +39,12 @@ const LoadedGridList = () => {
           <h5>Teams</h5>
         </Link>
       </Box>
-      <Box display="flex" flexWrap="wrap" gap={1} sx={{ boxShadow: 'none' }}>
+      <Box
+        display="flex"
+        flexWrap="wrap"
+        gap={1}
+        sx={{ boxShadow: 'none', paddingLeft: '12px', paddingBottom: '12px' }}
+      >
         {data.map(record => (
           <RecordContextProvider key={record.id} value={record}>
             <TeamCard />
