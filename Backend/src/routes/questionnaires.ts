@@ -145,7 +145,7 @@ router.get("/solve/:id", async (req, res) => {
       ) {
         const questionPromises = questionnaireData.questions.map(
           async (questionRef) => {
-            const trimmedQuestionId = questionRef.id.trim();
+            const trimmedQuestionId = questionRef.split("/").pop().trim();
             const trimmedQuestionRef = doc(db, "questions", trimmedQuestionId);
 
             const questionSnap = await getDoc(trimmedQuestionRef);

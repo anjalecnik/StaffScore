@@ -9,7 +9,7 @@ import {
   SortButton,
   SearchInput
 } from 'react-admin';
-import UserIcon from '@mui/icons-material/Group';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { CustomTypeIcon } from './CustomTypeIcon';
 
 export const QuestionList = () => {
@@ -17,7 +17,7 @@ export const QuestionList = () => {
     <RaList filters={userFilters} actions={<UserListActions />}>
       <Box display="flex" alignItems="center">
         <Box ml={2} mr={2} display="flex">
-          <UserIcon color="disabled" fontSize="large" />
+          <QuestionMarkIcon color="disabled" fontSize="large" />
         </Box>
         <Link underline="none" variant="h5" color="textSecondary">
           <h5>Questions</h5>

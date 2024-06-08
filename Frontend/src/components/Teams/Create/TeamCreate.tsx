@@ -1,6 +1,6 @@
 import { Create, Form, Toolbar } from 'react-admin';
 import { CardContent, Stack, Avatar, Box } from '@mui/material';
-import GroupWorkIcon from '@mui/icons-material/GroupWork';
+import GroupsIcon from '@mui/icons-material/Groups';
 import { TeamForm } from './TeamForm';
 
 export const TeamCreate = () => (
@@ -9,7 +9,7 @@ export const TeamCreate = () => (
       <CardContent>
         <Stack direction="row">
           <Avatar sx={{ mt: 1 }}>
-            <GroupWorkIcon />
+            <GroupsIcon />
           </Avatar>
           <Box ml={2} flex="1" maxWidth={796}>
             <TeamForm />
