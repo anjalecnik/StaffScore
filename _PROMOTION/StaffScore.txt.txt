@@ -1,0 +1,23 @@
+StaffScore
+
+StaffScore je spletna aplikacija za enostavno sledenje in ocenjevanje uspešnosti članov ekip, kar organizacijam omogoča rast in prepoznavanje talentov na podlagi podatkovno vodenih vpogledov.
+
+Leto izdelave: 2024
+
+Anja Lečnik
+
+Domača stran: https://staff-score-frontend.vercel.app/
+...
+
+Koda: https://github.com/anjalecnik/StaffScore
+
+Kategorizacija: spletna aplikacija
+
+Oznake: React, React Admin, Express, Firebase, PDFKit, Nodemailer, Recharts, 
+
+Opis projekta:
+StaffScore je spletna aplikacija za enostavno sledenje in ocenjevanje uspešnosti članov ekip, kar organizacijam omogoča rast in prepoznavanje talentov na podlagi podatkovno vodenih vpogledov.
+
+Vodje se že ob vstopu v aplikacijo srečajo s statistiko ocenjevanja, na voljo pa jim je tudi koledar z odštevalnikom do naslednjega termina kvartalnega ocenjevanja. Aplikacija nudi prijazno upravljanje uporabnikov in ekip ter zaradi uporabe GoogleAuth ne zahteva zapomnitve dodatnega gesla. Z barvnimi oznakami (tagi) je pregled nad zaposlenimi enostaven.
+
+Omogoča popolno prilagajanje vprašanj na vprašalnikih, vključno s prilagajanjem njihove teže. Po ocenjevanju je na voljo tudi PDF poročilo. Za kvaliteten vpogled v podatke so na voljo različni grafi: statistični graf ocenjevanja za posameznega uporabnika, ki prikazuje njegovo uspešnost na posameznih vprašalnikih, statistični graf ocenjevanja članov ekipe in hierarhični graf ekipe.
