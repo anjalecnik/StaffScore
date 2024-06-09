@@ -31,7 +31,7 @@ export const CalendarComponent = () => {
             justifyContent: 'space-between',
             alignItems: 'center',
             '& .icon': {
-              color: 'secondary.main'
+              color: 'primary.main'
             },
             '&:before': {
               position: 'absolute',
@@ -43,7 +43,7 @@ export const CalendarComponent = () => {
               aspectRatio: '1',
               transform: 'translate(-30%, -60%)',
               borderRadius: '50%',
-              backgroundColor: 'secondary.main',
+              backgroundColor: 'primary.main',
               opacity: 0.15
             }
           }}
@@ -56,7 +56,7 @@ export const CalendarComponent = () => {
             style={{ height: '100%' }}
           >
             <Grid item sm={5}>
-              <Box textAlign="right" sx={{ backgroundColor: '#FFFFFF', marginBottom: 10 }}>
+              <Box textAlign="right" sx={{ backgroundColor: 'inherit', marginBottom: 10 }}>
                 <Typography color="textSecondary">Days Untill Next Evaluation</Typography>
                 <Typography variant="h5" component="h2">
                   {daysUntilNextEvaluation || '/'}

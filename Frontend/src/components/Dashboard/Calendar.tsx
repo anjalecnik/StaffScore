@@ -28,7 +28,7 @@ export const Calendar = () => {
           } as any
         }}
         readOnly
-        sx={{ color: 'secondary.main', paddingLeft: '34px' }}
+        sx={{ color: 'primary.main', paddingLeft: '34px' }}
       />
     </LocalizationProvider>
   );

@@ -35,7 +35,7 @@ export const CardWithIcon = ({ icon, title, subtitle, to, children }: Props) => 
           justifyContent: 'space-between',
           alignItems: 'center',
           '& .icon': {
-            color: 'secondary.main'
+            color: 'primary.main'
           },
           '&:before': {
             position: 'absolute',
@@ -47,7 +47,7 @@ export const CardWithIcon = ({ icon, title, subtitle, to, children }: Props) => 
             aspectRatio: '1',
             transform: 'translate(-30%, -60%)',
             borderRadius: '50%',
-            backgroundColor: 'secondary.main',
+            backgroundColor: 'primary.main',
             opacity: 0.15
           }
         }}

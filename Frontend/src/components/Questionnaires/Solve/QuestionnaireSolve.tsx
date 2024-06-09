@@ -80,6 +80,7 @@ const QuestionnaireSolveContent = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [formValues, setFormValues] = useState<any>({});
   const [answeredQuestions, setAnsweredQuestions] = useState<AnsweredQuestions>({});
+  const [backgroundColor, setBackgroundColor] = useState<string>('#F5F5F5');
 
   if (!questionnaire) return null;
 
@@ -98,6 +99,16 @@ const QuestionnaireSolveContent = ({
       [questionId]: true
     }));
   };
+
+  useEffect(() => {
+    const changeBackgroundColor = () => {
+      setBackgroundColor(
+        localStorage.getItem('RaStore.theme') === '"light"' ? '#F5F5F5' : '#212121'
+      );
+    };
+
+    changeBackgroundColor();
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -162,7 +173,7 @@ const QuestionnaireSolveContent = ({
               </Stack>
             </CardContent>
           </Card>
-          <Toolbar className="custom-toolbar">
+          <Toolbar className="custom-toolbar" sx={{ backgroundColor: backgroundColor }}>
             <Button
               onClick={handleSubmit}
               type="submit"
@@ -174,7 +185,8 @@ const QuestionnaireSolveContent = ({
                 lineHeight: '1.75',
                 letterSpacing: '0.02857em',
                 minWidth: '64px',
-                padding: '6px 16px'
+                padding: '6px 16px',
+                color: 'primary'
               }}
               startIcon={<SaveIcon />}
               disabled={!questionnaire.questions.every(question => answeredQuestions[question.id])}
@@ -207,10 +219,22 @@ const Question = ({ question, onFormControlChange }: QuestionTemplateProps) => {
 const BinaryQuestion = ({ question, onFormControlChange }: QuestionTemplateProps) => {
   const { id } = question;
 
+  const [backgroundColor, setBackgroundColor] = useState<string>('#F5F5F5');
+
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     onFormControlChange(id, value);
   };
+
+  useEffect(() => {
+    const changeBackgroundColor = () => {
+      setBackgroundColor(
+        localStorage.getItem('RaStore.theme') === '"light"' ? '#F5F5F5' : '#212121'
+      );
+    };
+
+    changeBackgroundColor();
+  }, []);
 
   return (
     <>
@@ -229,12 +253,11 @@ const BinaryQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Yes"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#F5F5F5',
+            backgroundColor: backgroundColor,
             marginLeft: '5px',
             marginTop: '2px',
             paddingRight: '15px',
-            borderRadius: '5px',
-            color: 'black'
+            borderRadius: '5px'
           }}
         />
         <FormControlLabel
@@ -243,12 +266,11 @@ const BinaryQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="No"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#F5F5F5',
+            backgroundColor: backgroundColor,
             marginLeft: '5px',
             marginTop: '2px',
             paddingRight: '15px',
-            borderRadius: '5px',
-            color: 'black'
+            borderRadius: '5px'
           }}
         />
       </RadioGroup>
@@ -259,10 +281,22 @@ const BinaryQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
 const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps) => {
   const { id } = question;
 
+  const [backgroundColor, setBackgroundColor] = useState<string>('#F5F5F5');
+
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     onFormControlChange(id, value);
   };
+
+  useEffect(() => {
+    const changeBackgroundColor = () => {
+      setBackgroundColor(
+        localStorage.getItem('RaStore.theme') === '"light"' ? '#F5F5F5' : '#212121'
+      );
+    };
+
+    changeBackgroundColor();
+  }, []);
 
   return (
     <>
@@ -281,11 +315,10 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Strongly Disagree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#F5F5F5',
+            backgroundColor: backgroundColor,
             marginLeft: '5px',
             marginTop: '2px',
-            borderRadius: '5px',
-            color: 'black'
+            borderRadius: '5px'
           }}
         />
         <FormControlLabel
@@ -294,7 +327,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Disagree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#F5F5F5',
+            backgroundColor: backgroundColor,
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
@@ -306,7 +339,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Neutral"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#F5F5F5',
+            backgroundColor: backgroundColor,
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
@@ -318,7 +351,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Agree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#F5F5F5',
+            backgroundColor: backgroundColor,
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
@@ -330,7 +363,7 @@ const RatingQuestion = ({ question, onFormControlChange }: QuestionTemplateProps
           label="Strongly Agree"
           className="customDisabledClass"
           sx={{
-            backgroundColor: '#F5F5F5',
+            backgroundColor: backgroundColor,
             marginLeft: '5px',
             marginTop: '2px',
             borderRadius: '5px'
