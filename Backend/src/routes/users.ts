@@ -250,7 +250,17 @@ router.get("/:id", async (req, res) => {
         };
 
         if (userData.teams && Array.isArray(userData.teams)) {
-          const teamPromises = userData.teams.map(async (teamRef) => {
+          const uniqueTeamIds: string[] = [];
+          const filteredTeams = userData.teams.filter((teamRef) => {
+            const trimmedTeamId = teamRef.id.trim();
+            if (!uniqueTeamIds.includes(trimmedTeamId)) {
+              uniqueTeamIds.push(trimmedTeamId);
+              return true;
+            }
+            return false;
+          });
+
+          const teamPromises = filteredTeams.map(async (teamRef) => {
             const trimmedTeamId = teamRef.id.trim();
             const trimmedTeamRef = doc(db, "teams", trimmedTeamId);
 

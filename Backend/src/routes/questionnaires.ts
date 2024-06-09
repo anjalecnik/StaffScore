@@ -354,8 +354,8 @@ router.post("/solve", async (req, res) => {
           Array.isArray(questionnaireData.questions)
         ) {
           const questionPromises = questionnaireData.questions.map(
-            async (questionRef: { id: string }) => {
-              const trimmedQuestionId = questionRef.id.trim();
+            async (questionRef) => {
+              const trimmedQuestionId = questionRef.split("/").pop().trim();
               const trimmedQuestionRef = doc(
                 db,
                 "questions",
