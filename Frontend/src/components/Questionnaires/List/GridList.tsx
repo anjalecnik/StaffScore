@@ -1,6 +1,6 @@
 import { Box, Paper, Link } from '@mui/material';
 import { RecordContextProvider, useListContext } from 'react-admin';
-import GroupsIcon from '@mui/icons-material/Groups';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { IQuestionnaire } from '../../../types/IQuestionnaire';
 import { QuestionnaireCard } from './QuestionnaireCard';
 
@@ -33,7 +33,7 @@ const LoadedGridList = () => {
     <>
       <Box display="flex" alignItems="center">
         <Box ml={2} mr={2} display="flex">
-          <GroupsIcon color="disabled" fontSize="large" />
+          <AssignmentIcon color="disabled" fontSize="large" />
         </Box>
         <Link underline="none" variant="h5" color="textSecondary">
           <h5>Questionnaires</h5>
