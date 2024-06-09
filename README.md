@@ -7,7 +7,7 @@ Welcome to **StaffScore**, a web application designed to help team leaders track
 <br/>
 
 ## Vision 🌟
-Our vision for StaffScore is to become the leading tool for team performance evaluation, enabling organizations to foster growth, recognize talent, and make informed decisions based on data-driven insights. We aim to create a transparent and efficient system that promotes continuous improvement and facilitates constructive feedback within teams.
+The vision for StaffScore is to become the leading tool for team performance evaluation, enabling organizations to foster growth, recognize talent, and make informed decisions based on data-driven insights. The goal is to create a transparent and efficient system that promotes continuous improvement and facilitates constructive feedback within teams.
 <br/>
 
 ## Competitors 🏅
@@ -62,9 +62,14 @@ Our vision for StaffScore is to become the leading tool for team performance eva
   - Executives can add new tags.
 
 ### Tech Stack 🛠️
-  - Frontend: [React](https://react.dev/) (Vite TS starter), [React Admin](https://marmelab.com/react-admin/), [Material UI](https://mui.com/) 
-  - Backend: Node.js (Express).
-  - Database: [Firebase](https://firebase.google.com/) (Firestore, Google auth for login)
+<div style="width: 100%; text-align: center;">
+  
+| React | TypeScript | Material UI | React-admin | Node.js | Firebase | GoogleAuth | Vercel |
+| :---: | :--------: | :----: | :-----: | :------: | :------: | :----: | :----: |
+| <a href="https://react.dev/" title="React"><img src="https://github.com/get-icon/geticon/raw/master/icons/react.svg" alt="React" width="50px" height="50px"></a> | <a href="https://www.typescriptlang.org/" title="Typescript"><img src="https://github.com/get-icon/geticon/raw/master/icons/typescript-icon.svg" alt="Typescript" width="50px" height="50px"></a> | <a href="https://mui.com/material-ui/" title="MaterialUI"><img src="https://github.com/get-icon/geticon/blob/master/icons/material-ui.svg" alt="MaterialUI" width="50px" height="50px"></a> | <a href="https://marmelab.com/react-admin/" title="React-admin"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/React_Admin_logo.svg/1200px-React_Admin_logo.svg.png" alt="React-admin" width="50px" height="50px"></a> | <a href="https://nodejs.org/en" title="Node.js"><img src="https://github.com/get-icon/geticon/blob/master/icons/nodejs.svg" alt="Node.js" width="50px" height="50px"></a> |<a href="https://www.firebase.com/" title="Firebase"><img src="https://github.com/get-icon/geticon/raw/master/icons/firebase.svg" alt="Firebase" width="50px" height="50px"></a> | <a href="https://developers.google.com/identity/sign-in/web/sign-in" title="Google Auth"><img src="https://github.com/anjalecnik/StaffScore/assets/108223734/3db99a14-b806-4feb-aa2d-d0ad4f551339" alt="Google Auth" width="70px" height="50px"></a> | <a href="https://vercel.com/" title="Vercel"><img src="https://github.com/get-icon/geticon/blob/master/icons/vercel.svg" alt="Vercel" width="50px" height="50px"></a>
+
+
+</div>
 
 ### Deployment 🚀
   - The app is deployed on Vercel. Check it out [here](https://staff-score-frontend.vercel.app/).
@@ -103,10 +108,36 @@ StaffScore connects with:
      MAIL_USERNAME="<EmailID>"
      MAIL_PASSWORD="<Generated Password without Spaces>"
      ```
+
 5. Set Up Firebase (optional)
    - Create a Firebase project.
    - Set up Firestore and Google authentication.
    - Update your Firebase config in the frontend and backend.
+<br/>
+
+## App Previews
+Here are some screenshots showcasing different features of the app:
+<p >
+  <img alt="dashboard" width="800" src="https://github.com/anjalecnik/StaffScore/assets/108223734/21ef12a7-731e-41eb-bd98-e55d0ba8f868">
+  <br/>
+  Upon entering the application, managers are greeted with evaluation statistics dashboard and have access to a calendar with a countdown to the next quarterly evaluation date.
+
+  <p float="left">
+    <img src="https://github.com/anjalecnik/StaffScore/assets/108223734/41cab198-62c1-43f4-9545-890edc33694a" width="400" />
+    <img src="https://github.com/anjalecnik/StaffScore/assets/108223734/1f3c7a90-9324-4da4-bea5-55b0405b1faa" width="400" />
+    <br/>
+    For a quality insight into the data, various graphs are available: a statistical graph of individual user evaluations, showing their performance on specific questionnaires, a hierarchical team graph and a statistical graph of team member evaluations.
+  </p>
+
+  <p float="left">
+    <img src="https://github.com/anjalecnik/StaffScore/assets/108223734/37a7fe98-9fd4-45fb-95a0-949e266a49a9" height="277" />
+    <img src="https://github.com/anjalecnik/StaffScore/assets/108223734/d96a2c97-0c07-4907-b253-7c08b8c5b67a" height="277" />
+    <br/>
+    It enables full customization of questions on questionnaires, including adjusting their weight. After evaluation, a PDF report is also available.
+  </p>
+
+  For additional screenshots of the app, please navigate to the [PROMOTION](https://github.com/anjalecnik/StaffScore/tree/main/_PROMOTION)  folder.
+</p>
 <br/>
 
 ## Known Issues/Problems 🐛
@@ -115,6 +146,11 @@ StaffScore connects with:
 - **Filtering**: Filtering tables can only be used after sorting has been selected.
 - **Search Functionality**: Case-insensitive search and substring search are not available due to Firebase limitations.
 - **Form validation**: The form remains in a dirty state even after values are cleared, causing the submit button to remain enabled due to React Admin's behavior.
+<br/>
+
+## Author
+[Anja Lečnik](https://si.linkedin.com/in/anja-lecnik)
+
 -----
 <br/>
-Thank you for using StaffScore! We hope it makes managing your team a breeze! 😊
+Thank you for using StaffScore! Managing your team should be a breeze! 😊
