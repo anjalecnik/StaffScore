@@ -150,7 +150,3 @@ Here are some screenshots showcasing different features of the app:
 
 ## Author
 [Anja Lečnik](https://si.linkedin.com/in/anja-lecnik)
-
------
-<br/>
-Thank you for using StaffScore! Managing your team should be a breeze! 😊
