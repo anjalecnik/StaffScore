@@ -1,4 +1,4 @@
-import { Admin, Resource, CustomRoutes } from 'react-admin';
+import { Admin, Resource, CustomRoutes, Layout } from 'react-admin';
 import { dataProvider } from './dataProvider';
 import UserIcon from '@mui/icons-material/Group';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -27,6 +27,7 @@ import { QuestionnaireCreate } from './components/Questionnaires/Create/Question
 import { QuestionnaireEdit } from './components/Questionnaires/Edit/QuestionnaireEdit';
 import { Route } from 'react-router-dom';
 import { QuestionnaireSolve } from './components/Questionnaires/Solve/QuestionnaireSolve';
+import { CustomAppBar } from './layout/CustomAppBar';
 
 export default function App() {
   return (
@@ -37,6 +38,8 @@ export default function App() {
         dataProvider={dataProvider}
         dashboard={Dashboard}
         loginPage={LoginPage}
+        layout={CustomLayout}
+        darkTheme={{ palette: { mode: 'dark' } }}
       >
         <Resource
           name="users"
@@ -87,3 +90,6 @@ export default function App() {
     </>
   );
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CustomLayout = (props: any) => <Layout {...props} appBar={CustomAppBar} />;
