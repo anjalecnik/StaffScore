@@ -140,6 +140,10 @@ Here are some screenshots showcasing different features of the app:
 </p>
 <br/>
 
+## Additional Features 🌃
+The app includes a dark theme for improved user experience in low-light environments.
+<br/><br/>
+
 ## Known Issues/Problems 🐛
 - **Mobile Responsiveness**: Certain UI components need optimization for smaller screens.
 - **Dashboard UI**: The dashboard UI is not correctly responsive on large screens (only looks good on laptop size).
