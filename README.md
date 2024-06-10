@@ -89,13 +89,13 @@ StaffScore connects with:
    ```
 2. Install Frontend Dependencies
     ```bash
-    cd frontend
+    cd Frontend
     npm install
     npm run dev
    ```
-3. Install Backend Dependencies
+3. Open a new terminal and install Backend Dependencies
     ```bash
-    cd ../backend
+    cd Backend
     npm install
     npm run dev
    ```
