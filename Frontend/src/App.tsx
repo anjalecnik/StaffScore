@@ -37,6 +37,7 @@ export default function App() {
         dataProvider={dataProvider}
         dashboard={Dashboard}
         loginPage={LoginPage}
+        darkTheme={{ palette: { mode: 'dark' } }}
       >
         <Resource
           name="users"

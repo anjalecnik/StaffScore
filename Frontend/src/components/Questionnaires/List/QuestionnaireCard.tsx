@@ -41,8 +41,8 @@ export const QuestionnaireCard = (props: { record?: IQuestionnaire }) => {
       >
         <Box display="flex" flexDirection="column" alignItems="center">
           <Avatar
-            src="./inovait.jpg"
-            alt="InovaIT"
+            src="./questionnaire.jpg"
+            alt="Questionnaire"
             sx={{
               bgcolor: 'aliceblue',
               '& img': { objectFit: 'contain' }

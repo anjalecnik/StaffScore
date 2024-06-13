@@ -1,11 +1,18 @@
 import { Router } from "express";
 import { db } from "../config/firebase";
-import { getDocs, collection, query, where } from "firebase/firestore";
+import {
+  getDocs,
+  doc,
+  collection,
+  query,
+  where,
+  updateDoc,
+} from "firebase/firestore";
 
 const router = Router();
 
 router.post("/check-user", async (req, res) => {
-  const { email } = req.body;
+  const { email, photoUrl } = req.body;
 
   try {
     const usersRef = collection(db, "users");
@@ -15,6 +22,13 @@ router.post("/check-user", async (req, res) => {
     if (!querySnapshot.empty) {
       const userData = querySnapshot.docs[0].data();
       const userId = querySnapshot.docs[0].id;
+
+      const updateData: { [key: string]: any } = {
+        photoUrl: photoUrl,
+      };
+
+      const userDocRef = doc(db, "users", userId);
+      await updateDoc(userDocRef, updateData);
 
       res.json({ userData, userId });
     } else {

@@ -42,8 +42,8 @@ export const TeamCard = (props: { record?: ITeam }) => {
       >
         <Box display="flex" flexDirection="column" alignItems="center">
           <Avatar
-            src="./inovait.jpg"
-            alt="InovaIT"
+            src="./image.jpg"
+            alt="Image"
             sx={{
               bgcolor: 'aliceblue',
               '& img': { objectFit: 'contain' }
@@ -69,7 +69,7 @@ export const TeamCard = (props: { record?: ITeam }) => {
             <InsightsIcon color="disabled" sx={{ mr: 1 }} />
             <div>
               <Typography variant="subtitle2" sx={{ mb: -1 }}>
-                0
+                {record.averageEvaluation}
               </Typography>
               <Typography variant="caption" color="textSecondary">
                 grade

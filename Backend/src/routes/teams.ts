@@ -18,9 +18,15 @@ import {
   DocumentData,
   Query,
   Timestamp,
+  DocumentReference,
 } from "firebase/firestore";
 
 const router = Router();
+
+export interface ITeamStatistic {
+  evaluation: number;
+  user: string;
+}
 
 /** GET all teams */
 router.get("/", async (req, res) => {
@@ -47,12 +53,55 @@ router.get("/", async (req, res) => {
 
     const teamsSnapshot = await getDocs(qu);
 
-    const teams = teamsSnapshot.docs.map((doc) => ({
+    const statisticsSnapshot = await getDocs(collection(db, "statistics"));
+
+    const statistics: ITeamStatistic[] = statisticsSnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data(),
+      evaluation: doc.data().evaluation,
+      user: doc.data().user.id,
     }));
 
-    const ascDescTeams = order === "desc" ? teams.reverse() : teams;
+    const teams = teamsSnapshot.docs.map((doc) => {
+      const teamData = doc.data();
+
+      let memberIds = [];
+      if (teamData.members) {
+        memberIds = teamData.members.map(
+          (memberRef: DocumentReference) => memberRef.id
+        );
+      }
+
+      return {
+        id: doc.id,
+        ...teamData,
+        memberIds: memberIds,
+      };
+    });
+
+    const teamsWithAverageEvaluation = teams.map((team) => {
+      const memberStatistics = statistics.filter((stat) =>
+        team.memberIds.includes(stat.user)
+      );
+
+      const totalEvaluation = memberStatistics.reduce(
+        (acc, curr) => acc + curr.evaluation,
+        0
+      );
+      const averageEvaluation =
+        memberStatistics.length > 0
+          ? totalEvaluation / memberStatistics.length
+          : 0;
+
+      return {
+        ...team,
+        averageEvaluation: Math.round(averageEvaluation * 5 * 100) / 100,
+      };
+    });
+
+    const ascDescTeams =
+      order === "desc"
+        ? teamsWithAverageEvaluation.reverse()
+        : teamsWithAverageEvaluation;
 
     res.setHeader("X-Total-Count", ascDescTeams.length.toString());
     res.setHeader("Access-Control-Expose-Headers", "X-Total-Count");

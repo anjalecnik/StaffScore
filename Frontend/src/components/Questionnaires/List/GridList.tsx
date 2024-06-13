@@ -1,6 +1,6 @@
 import { Box, Paper, Link } from '@mui/material';
 import { RecordContextProvider, useListContext } from 'react-admin';
-import GroupsIcon from '@mui/icons-material/Groups';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { IQuestionnaire } from '../../../types/IQuestionnaire';
 import { QuestionnaireCard } from './QuestionnaireCard';
 
@@ -33,13 +33,18 @@ const LoadedGridList = () => {
     <>
       <Box display="flex" alignItems="center">
         <Box ml={2} mr={2} display="flex">
-          <GroupsIcon color="disabled" fontSize="large" />
+          <AssignmentIcon color="disabled" fontSize="large" />
         </Box>
         <Link underline="none" variant="h5" color="textSecondary">
           <h5>Questionnaires</h5>
         </Link>
       </Box>
-      <Box display="flex" flexWrap="wrap" gap={1} sx={{ boxShadow: 'none' }}>
+      <Box
+        display="flex"
+        flexWrap="wrap"
+        gap={1}
+        sx={{ boxShadow: 'none', paddingLeft: '12px', paddingBottom: '12px' }}
+      >
         {data.map(record => (
           <RecordContextProvider key={record.id} value={record}>
             <QuestionnaireCard />
