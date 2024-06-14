@@ -345,9 +345,22 @@ router.post("/", async (req, res) => {
   const { email, tags_ids, ...otherAttributes } = req.body;
 
   try {
+    // Check if a user with the given email already exists
+    const userQuery = query(
+      collection(db, "users"),
+      where("email", "==", email)
+    );
+    const userQuerySnapshot = await getDocs(userQuery);
+
+    if (!userQuerySnapshot.empty) {
+      return res
+        .status(400)
+        .json({ error: "User with this email already exists" });
+    }
+
     const newUserRef = await addDoc(collection(db, "users"), {
       email: email,
-      tags: tags_ids.map((id: string) => doc(db, "tags", id)),
+      tags: tags_ids ? tags_ids.map((id: string) => doc(db, "tags", id)) : [],
       lastModified: serverTimestamp(),
       ...otherAttributes,
     });

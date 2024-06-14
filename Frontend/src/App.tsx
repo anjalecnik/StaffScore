@@ -27,12 +27,14 @@ import { QuestionnaireCreate } from './components/Questionnaires/Create/Question
 import { QuestionnaireEdit } from './components/Questionnaires/Edit/QuestionnaireEdit';
 import { Route } from 'react-router-dom';
 import { QuestionnaireSolve } from './components/Questionnaires/Solve/QuestionnaireSolve';
+import { CustomLayout } from './components/layout/CustomLayout';
 
 export default function App() {
   return (
     <>
       <Admin
         title="StaffScore"
+        layout={CustomLayout}
         authProvider={authProvider}
         dataProvider={dataProvider}
         dashboard={Dashboard}
