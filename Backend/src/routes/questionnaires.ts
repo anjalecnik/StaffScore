@@ -416,7 +416,7 @@ router.post("/solve", async (req, res) => {
           newEvaluationRef.id,
           userData,
           formValues,
-          evaluation
+          Math.round(evaluation * 100) / 100
         );
 
         res.json(newEvaluationRef);

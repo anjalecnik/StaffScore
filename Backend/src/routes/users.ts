@@ -166,7 +166,8 @@ router.get("/:id", async (req, res) => {
             (sum, stat) => sum + stat.evaluation,
             0
           );
-          const avgEv = totalEvaluation / stats.length;
+          const avgEv =
+            Math.round((totalEvaluation / stats.length) * 100) / 100;
 
           const questionnaireAvg = stats.reduce(
             (acc: { [key: string]: number[] }, stat) => {
@@ -186,7 +187,9 @@ router.get("/:id", async (req, res) => {
                   (sum, evaluation) => sum + evaluation,
                   0
                 );
-                acc[qId] = total / questionnaireAvg[qId].length;
+                acc[qId] =
+                  Math.round((total / questionnaireAvg[qId].length) * 100) /
+                  100;
               } else {
                 acc[qId] = null;
               }

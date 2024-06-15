@@ -230,7 +230,8 @@ router.get("/:id", async (req, res) => {
                 if (!aggregated[quarter][key]) {
                   aggregated[quarter][key] = { sum: 0, count: 0 };
                 }
-                aggregated[quarter][key].sum += stat[key] as number;
+                aggregated[quarter][key].sum +=
+                  Math.round((stat[key] as number) * 100) / 100;
                 aggregated[quarter][key].count++;
               }
             });
@@ -264,7 +265,8 @@ router.get("/:id", async (req, res) => {
 
             for (const user in aggregatedQuarter) {
               const { sum, count } = aggregatedQuarter[user];
-              averageAggregatedQuarter[user] = sum / count;
+              averageAggregatedQuarter[user] =
+                Math.round((sum / count) * 100) / 100;
             }
 
             formattedAggregated.push(averageAggregatedQuarter);
