@@ -1,5 +1,7 @@
 import { List, TopToolbar, ExportButton, CreateButton, SortButton, SearchInput } from 'react-admin';
 import { ImageList } from './GridList';
+import { usePermissions } from 'react-admin';
+import { QuestionnaireRoles } from '../../../shared/auth/questionnaireRoles';
 
 export const QuestionnaireList = () => {
   return (
@@ -12,11 +14,15 @@ export const QuestionnaireList = () => {
 const questionnairesFilters = [<SearchInput source="q" alwaysOn />];
 
 const TeamListActions = () => {
+  const { permissions } = usePermissions();
+
   return (
     <TopToolbar>
       <SortButton fields={['name']} />
       <ExportButton />
-      <CreateButton variant="contained" label="New Questionnaire" sx={{ marginLeft: 2 }} />
+      {permissions.includes(QuestionnaireRoles.Questionnaire_CanManage) && (
+        <CreateButton variant="contained" label="New Questionnaire" sx={{ marginLeft: 2 }} />
+      )}
     </TopToolbar>
   );
 };

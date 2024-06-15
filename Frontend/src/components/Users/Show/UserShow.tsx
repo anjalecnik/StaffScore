@@ -11,7 +11,7 @@ import {
   useMediaQuery,
   Theme
 } from '@mui/material';
-import { IUser } from '../../../types/IUser';
+import { IUser } from '../../../shared/types/IUser';
 import { Avatar } from './Avatar';
 import Rating from '@mui/material/Rating';
 import Aside from './Aside/Aside';

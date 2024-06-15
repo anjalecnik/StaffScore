@@ -6,8 +6,8 @@ import { NbTeams } from './NbTeams';
 import { AvgEvaluation } from './AvgEvaluation';
 import { CSSProperties, useEffect, useState } from 'react';
 import { API_URL } from '../../dataProvider';
-import { IDashboardData } from '../../types/IDashboardData';
-import { IDashboardStatistic } from '../../types/IDashboardStatistic';
+import { IDashboardData } from '../../shared/types/IDashboardData';
+import { IDashboardStatistic } from '../../shared/types/IDashboardStatistic';
 import { Statistics } from './Statistics';
 import { CalendarComponent } from './CalendarComponent';
 

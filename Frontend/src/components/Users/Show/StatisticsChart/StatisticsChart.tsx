@@ -1,5 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { IStatistic } from '../../../../types/IStatistic';
+import { IStatistic } from '../../../../shared/types/IStatistic';
 import { useNavigate } from 'react-router-dom';
 import { CardHeader, CardMedia } from '@mui/material';
 import { DataKey } from 'recharts/types/util/types';

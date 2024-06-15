@@ -1,6 +1,6 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { CardHeader, CardMedia, Card } from '@mui/material';
-import { IDashboardStatistic } from '../../types/IDashboardStatistic';
+import { IDashboardStatistic } from '../../shared/types/IDashboardStatistic';
 
 export const Statistics = (props: { data?: IDashboardStatistic[] }) => {
   return (

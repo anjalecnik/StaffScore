@@ -7,7 +7,7 @@ import {
   SelectArrayInput
 } from 'react-admin';
 import { Divider } from '@mui/material';
-import { IUser } from '../../../types/IUser';
+import { IUser } from '../../../shared/types/IUser';
 
 export const TeamForm = () => (
   <>

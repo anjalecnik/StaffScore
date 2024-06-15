@@ -18,6 +18,7 @@ export const authProvider: AuthProvider = {
   // called when the user clicks on the logout button
   logout: () => {
     cookies.remove('sessionToken');
+    cookies.remove('permissions');
     return Promise.resolve();
   },
   // called when the API returns an error
@@ -33,5 +34,8 @@ export const authProvider: AuthProvider = {
     return cookies.get('sessionToken') ? Promise.resolve() : Promise.reject();
   },
   // called when the user navigates to a new location, to check for permissions / roles
-  getPermissions: () => Promise.resolve()
+  getPermissions: () => {
+    const role = cookies.get('permissions') || [];
+    return role ? Promise.resolve(role) : Promise.reject();
+  }
 };

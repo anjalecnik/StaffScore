@@ -11,7 +11,7 @@ import {
   useMediaQuery,
   Theme
 } from '@mui/material';
-import { ITeam } from '../../../types/ITeam';
+import { ITeam } from '../../../shared/types/ITeam';
 import InfoIcon from '@mui/icons-material/Info';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,8 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import Alert from '@mui/material/Alert';
 import { BasicInformation } from './BasicInformation';
 import { StatisticsChart } from './StatisticsChart/StatisticsChart';
+import { usePermissions } from 'react-admin';
+import { TeamRoles } from '../../../shared/auth/teamRoles';
 
 export const TeamShow = () => (
   <ShowBase>
@@ -50,6 +52,12 @@ const TeamShowContent = () => {
     };
   }, []);
 
+  const { permissions } = usePermissions();
+
+  if (!permissions || !Array.isArray(permissions)) {
+    return null;
+  }
+
   if (!record) return null;
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -66,9 +74,11 @@ const TeamShowContent = () => {
                 <Box ml={2} flex="1">
                   <Typography variant="h5">{record.name}</Typography>
                 </Box>
-                <Box>
-                  <EditButton label="Edit Team" />
-                </Box>
+                {permissions.includes(TeamRoles.Team_CanManage) && (
+                  <Box>
+                    <EditButton label="Edit Team" />
+                  </Box>
+                )}
               </Box>
             </CardContent>
             <CardContent>

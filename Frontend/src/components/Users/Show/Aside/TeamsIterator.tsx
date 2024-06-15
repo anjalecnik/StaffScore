@@ -1,6 +1,6 @@
 import { useCreatePath, useRecordContext } from 'react-admin';
 import { Box, Typography } from '@mui/material';
-import { IUser } from '../../../../types/IUser';
+import { IUser } from '../../../../shared/types/IUser';
 import { Link as MuiLink } from '@mui/material';
 import { Link } from 'react-router-dom';
 

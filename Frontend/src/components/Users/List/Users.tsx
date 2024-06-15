@@ -12,6 +12,8 @@ import {
 } from 'react-admin';
 import UserIcon from '@mui/icons-material/Group';
 import { CustomAvatar } from './CustomAvatar';
+import { usePermissions } from 'react-admin';
+import { UserRoles } from '../../../shared/auth/userRoles';
 
 export const UserList = () => {
   const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
@@ -47,10 +49,20 @@ export const UserList = () => {
 
 const userFilters = [<SearchInput source="q" alwaysOn />];
 
-const UserListActions = () => (
-  <TopToolbar>
-    <SortButton fields={['displayName', 'email']} />
-    <ExportButton />
-    <CreateButton variant="contained" label="New User" sx={{ marginLeft: 2 }} />
-  </TopToolbar>
-);
+const UserListActions = () => {
+  const { permissions } = usePermissions();
+
+  if (!permissions || !Array.isArray(permissions)) {
+    return null;
+  }
+
+  return (
+    <TopToolbar>
+      <SortButton fields={['displayName', 'email']} />
+      <ExportButton />
+      {permissions.includes(UserRoles.User_CanManage) && (
+        <CreateButton variant="contained" label="New User" sx={{ marginLeft: 2 }} />
+      )}
+    </TopToolbar>
+  );
+};

@@ -1,7 +1,7 @@
 import { Box, Paper, Link } from '@mui/material';
 import { RecordContextProvider, useListContext } from 'react-admin';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { IQuestionnaire } from '../../../types/IQuestionnaire';
+import { IQuestionnaire } from '../../../shared/types/IQuestionnaire';
 import { QuestionnaireCard } from './QuestionnaireCard';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

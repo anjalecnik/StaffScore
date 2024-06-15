@@ -8,7 +8,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import './../../../assets/questionaireView.css';
 import { useEffect, useState } from 'react';
 import { API_URL } from '../../../dataProvider';
-import { IQuestion } from '../../../types/IQuestion';
+import { IQuestion } from '../../../shared/types/IQuestion';
 import { Alert } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import './../../../assets/questionnaireSolve.css';

@@ -3,27 +3,39 @@ import { Paper, Typography, Link as MuiLink, Box, Avatar } from '@mui/material';
 import { useCreatePath, useRecordContext } from 'react-admin';
 import { Link } from 'react-router-dom';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { IQuestionnaire } from '../../../types/IQuestionnaire';
+import { IQuestionnaire } from '../../../shared/types/IQuestionnaire';
+import { usePermissions } from 'react-admin';
+import { QuestionnaireRoles } from '../../../shared/auth/questionnaireRoles';
 
 export const QuestionnaireCard = (props: { record?: IQuestionnaire }) => {
   const [elevation, setElevation] = useState(1);
   const createPath = useCreatePath();
   const record = useRecordContext<IQuestionnaire>(props);
+  const { permissions } = usePermissions();
+
   if (!record) return null;
+
+  if (!permissions || !Array.isArray(permissions)) {
+    return null;
+  }
 
   let noOfQuestions = 0;
   if (record.questions) {
     noOfQuestions = record.questions.length;
   }
 
-  return (
-    <MuiLink
-      component={Link}
-      to={createPath({
+  const linkTo = permissions.includes(QuestionnaireRoles.Questionnaire_CanManage)
+    ? createPath({
         resource: 'questionnaires',
         id: record.id,
         type: 'edit'
-      })}
+      })
+    : '#';
+
+  return (
+    <MuiLink
+      component={Link}
+      to={linkTo}
       underline="none"
       onMouseEnter={() => setElevation(3)}
       onMouseLeave={() => setElevation(1)}
