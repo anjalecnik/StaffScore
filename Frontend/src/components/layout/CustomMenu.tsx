@@ -9,6 +9,7 @@ import { TeamRoles } from '../../shared/auth/teamRoles.ts';
 import { UserRoles } from '../../shared/auth/userRoles.ts';
 import { QuestionnaireRoles } from '../../shared/auth/questionnaireRoles.ts';
 import { QuestionRoles } from '../../shared/auth/questionRoles.ts';
+import './../../assets/menu.css';
 
 export const CustomMenu = () => {
   const { permissions } = usePermissions();

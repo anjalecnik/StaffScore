@@ -5,6 +5,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
+import './../../assets/menu.css';
 
 type SubmenuProps = {
   text: string;

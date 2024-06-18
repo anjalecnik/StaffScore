@@ -40,6 +40,7 @@ export default function App() {
         dashboard={Dashboard}
         loginPage={LoginPage}
         darkTheme={{ palette: { mode: 'dark' } }}
+        disableTelemetry
       >
         <Resource
           name="users"
