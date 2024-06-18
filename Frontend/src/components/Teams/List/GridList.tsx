@@ -2,7 +2,7 @@ import { Box, Paper, Link } from '@mui/material';
 import { RecordContextProvider, useListContext } from 'react-admin';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { TeamCard } from './TeamCard';
-import { ITeam } from '../../../types/ITeam';
+import { ITeam } from '../../../shared/types/ITeam';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const times = (nbChildren: number, fn: (key: number) => any) =>

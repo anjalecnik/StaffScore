@@ -21,9 +21,9 @@ import {
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { API_URL } from '../../../../dataProvider';
-import { ITeam } from '../../../../types/ITeam';
-import { IUser } from '../../../../types/IUser';
-import { IQuestion } from '../../../../types/IQuestion';
+import { ITeam } from '../../../../shared/types/ITeam';
+import { IUser } from '../../../../shared/types/IUser';
+import { IQuestion } from '../../../../shared/types/IQuestion';
 
 interface OrgChartProps {
   record: ITeam;

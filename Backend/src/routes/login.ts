@@ -30,7 +30,9 @@ router.post("/check-user", async (req, res) => {
       const userDocRef = doc(db, "users", userId);
       await updateDoc(userDocRef, updateData);
 
-      res.json({ userData, userId });
+      const roles = userData.roles || [];
+
+      res.json({ roles, userId });
     } else {
       res
         .status(404)

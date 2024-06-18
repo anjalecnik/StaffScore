@@ -3,7 +3,7 @@ import { Paper, Typography, Link as MuiLink, Box, Avatar } from '@mui/material';
 import ContactsIcon from '@mui/icons-material/AccountCircle';
 import { useCreatePath, useRecordContext } from 'react-admin';
 import { Link } from 'react-router-dom';
-import { ITeam } from '../../../types/ITeam';
+import { ITeam } from '../../../shared/types/ITeam';
 import InsightsIcon from '@mui/icons-material/Insights';
 
 export const TeamCard = (props: { record?: ITeam }) => {

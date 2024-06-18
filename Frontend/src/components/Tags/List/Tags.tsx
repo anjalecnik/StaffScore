@@ -12,9 +12,16 @@ import {
 import SellIcon from '@mui/icons-material/Sell';
 import { CustomChip } from './CustomChip';
 import { ColorField } from 'react-admin-color-picker';
+import { usePermissions } from 'react-admin';
+import { TagRoles } from '../../../shared/auth/tagRoles';
 
 export const TagList = () => {
   const isSmall = useMediaQuery<Theme>(theme => theme.breakpoints.down('sm'));
+  const { permissions } = usePermissions();
+
+  if (!permissions || !Array.isArray(permissions)) {
+    return null;
+  }
 
   return (
     <RaList filters={tagFilters} actions={<TagListActions />}>
@@ -29,7 +36,7 @@ export const TagList = () => {
 
       <List>
         {isSmall ? (
-          <Datagrid rowClick="edit">
+          <Datagrid rowClick={permissions.includes(TagRoles.Tag_CanManage) ? 'edit' : undefined}>
             <CustomChip />
           </Datagrid>
         ) : (
@@ -45,10 +52,20 @@ export const TagList = () => {
 
 const tagFilters = [<SearchInput source="q" alwaysOn />];
 
-const TagListActions = () => (
-  <TopToolbar>
-    <SortButton fields={['name']} />
-    <ExportButton />
-    <CreateButton variant="contained" label="New Tag" sx={{ marginLeft: 2 }} />
-  </TopToolbar>
-);
+const TagListActions = () => {
+  const { permissions } = usePermissions();
+
+  if (!permissions || !Array.isArray(permissions)) {
+    return null;
+  }
+
+  return (
+    <TopToolbar>
+      <SortButton fields={['name']} />
+      <ExportButton />
+      {permissions.includes(TagRoles.Tag_CanManage) && (
+        <CreateButton variant="contained" label="New Tag" sx={{ marginLeft: 2 }} />
+      )}
+    </TopToolbar>
+  );
+};

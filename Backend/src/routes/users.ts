@@ -166,7 +166,8 @@ router.get("/:id", async (req, res) => {
             (sum, stat) => sum + stat.evaluation,
             0
           );
-          const avgEv = totalEvaluation / stats.length;
+          const avgEv =
+            Math.round((totalEvaluation / stats.length) * 100) / 100;
 
           const questionnaireAvg = stats.reduce(
             (acc: { [key: string]: number[] }, stat) => {
@@ -186,7 +187,9 @@ router.get("/:id", async (req, res) => {
                   (sum, evaluation) => sum + evaluation,
                   0
                 );
-                acc[qId] = total / questionnaireAvg[qId].length;
+                acc[qId] =
+                  Math.round((total / questionnaireAvg[qId].length) * 100) /
+                  100;
               } else {
                 acc[qId] = null;
               }
@@ -342,12 +345,26 @@ function getQuarterName(date: Date): string {
 
 /** CREATE new user */
 router.post("/", async (req, res) => {
-  const { email, tags_ids, ...otherAttributes } = req.body;
+  const { email, tags_ids, roles, ...otherAttributes } = req.body;
 
   try {
+    // Check if a user with the given email already exists
+    const userQuery = query(
+      collection(db, "users"),
+      where("email", "==", email)
+    );
+    const userQuerySnapshot = await getDocs(userQuery);
+
+    if (!userQuerySnapshot.empty) {
+      return res
+        .status(400)
+        .json({ error: "User with this email already exists" });
+    }
+
     const newUserRef = await addDoc(collection(db, "users"), {
       email: email,
-      tags: tags_ids.map((id: string) => doc(db, "tags", id)),
+      tags: tags_ids ? tags_ids.map((id: string) => doc(db, "tags", id)) : [],
+      roles: roles ? roles : [],
       lastModified: serverTimestamp(),
       ...otherAttributes,
     });
@@ -396,7 +413,7 @@ async function sendWelcomeEmail(userEmail: string) {
 /** UPDATE user */
 router.put("/:userId", async (req, res) => {
   const { userId } = req.params;
-  const { tags, tags_ids, ...userDataToUpdate } = req.body; // Don't update tags!!
+  const { tags, tags_ids, roles, ...userDataToUpdate } = req.body; // Don't update tags!!
 
   try {
     const userDocRef = doc(db, "users", userId);
@@ -410,6 +427,10 @@ router.put("/:userId", async (req, res) => {
       ...userDataToUpdate,
       lastModified: serverTimestamp(),
     };
+
+    if (roles !== undefined) {
+      updateData.roles = roles;
+    }
 
     if (tags_ids !== undefined)
       updateData.tags = tags_ids.map((id: string) => doc(db, "tags", id));

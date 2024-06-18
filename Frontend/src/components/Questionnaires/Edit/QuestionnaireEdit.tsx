@@ -1,7 +1,7 @@
 import { Edit, Form, Toolbar, useEditController } from 'react-admin';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { CardContent, Stack, Avatar, Box } from '@mui/material';
-import { IQuestionnaireEdit } from '../../../types/IQuestionnaireEdit';
+import { IQuestionnaireEdit } from '../../../shared/types/IQuestionnaireEdit';
 import { QuestionnaireEditForm } from './QuestionnaireEditForm';
 
 export const QuestionnaireEdit = (props: IQuestionnaireEdit) => {

@@ -1,7 +1,7 @@
 import { useRecordContext } from 'react-admin';
 import { Typography, useMediaQuery, Theme, Box } from '@mui/material';
 import './../../../assets/details.css';
-import { IUser } from '../../../types/IUser';
+import { IUser } from '../../../shared/types/IUser';
 
 export const BasicInformation = () => {
   const record = useRecordContext<IUser>();

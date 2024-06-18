@@ -11,8 +11,16 @@ import {
 } from 'react-admin';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { CustomTypeIcon } from './CustomTypeIcon';
+import { usePermissions } from 'react-admin';
+import { QuestionRoles } from '../../../shared/auth/questionRoles';
 
 export const QuestionList = () => {
+  const { permissions } = usePermissions();
+
+  if (!permissions || !Array.isArray(permissions)) {
+    return null;
+  }
+
   return (
     <RaList filters={userFilters} actions={<UserListActions />}>
       <Box display="flex" alignItems="center">
@@ -25,7 +33,9 @@ export const QuestionList = () => {
       </Box>
 
       <List>
-        <Datagrid rowClick="edit">
+        <Datagrid
+          rowClick={permissions.includes(QuestionRoles.Question_CanManage) ? 'edit' : undefined}
+        >
           <TextField source="question" />
           <CustomTypeIcon />
         </Datagrid>
@@ -36,10 +46,20 @@ export const QuestionList = () => {
 
 const userFilters = [<SearchInput source="q" alwaysOn />];
 
-const UserListActions = () => (
-  <TopToolbar>
-    <SortButton fields={['question']} />
-    <ExportButton />
-    <CreateButton variant="contained" label="New Question" sx={{ marginLeft: 2 }} />
-  </TopToolbar>
-);
+const UserListActions = () => {
+  const { permissions } = usePermissions();
+
+  if (!permissions || !Array.isArray(permissions)) {
+    return null;
+  }
+
+  return (
+    <TopToolbar>
+      <SortButton fields={['question']} />
+      <ExportButton />
+      {permissions.includes(QuestionRoles.Question_CanManage) && (
+        <CreateButton variant="contained" label="New Question" sx={{ marginLeft: 2 }} />
+      )}
+    </TopToolbar>
+  );
+};

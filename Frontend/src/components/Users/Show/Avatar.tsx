@@ -1,6 +1,6 @@
 import { Avatar as MuiAvatar } from '@mui/material';
 import { useRecordContext } from 'react-admin';
-import { IUser } from '../../../types/IUser';
+import { IUser } from '../../../shared/types/IUser';
 
 export const Avatar = (props: { record?: IUser }) => {
   const record = useRecordContext<IUser>(props);

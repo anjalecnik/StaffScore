@@ -28,9 +28,15 @@ export const LoginPage = () => {
 
         if (response.ok) {
           notify(<Alert severity="success">Welcome back!</Alert>, { autoHideDuration: 3000 });
-          const { userData } = await response.json();
+          const { roles, userId } = await response.json();
 
-          cookies.set('sessionToken', userData.id, {
+          cookies.set('sessionToken', userId, {
+            path: '/',
+            sameSite: 'strict',
+            secure: true
+          });
+
+          cookies.set('permissions', roles, {
             path: '/',
             sameSite: 'strict',
             secure: true

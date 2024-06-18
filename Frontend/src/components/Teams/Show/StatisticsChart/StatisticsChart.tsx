@@ -1,5 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { IStatistic } from '../../../../types/IStatistic';
+import { IStatistic } from '../../../../shared/types/IStatistic';
 import { CardHeader, CardMedia } from '@mui/material';
 
 interface StatisticsChartProps {

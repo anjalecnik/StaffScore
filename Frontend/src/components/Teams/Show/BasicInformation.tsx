@@ -1,7 +1,7 @@
 import { useRecordContext } from 'react-admin';
 import { Typography, useMediaQuery, Theme } from '@mui/material';
 import './../../../assets/details.css';
-import { ITeam } from '../../../types/ITeam';
+import { ITeam } from '../../../shared/types/ITeam';
 
 export const BasicInformation = () => {
   const record = useRecordContext<ITeam>();
