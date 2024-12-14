@@ -4,7 +4,6 @@ import {
   getDocs,
   collection,
   getCountFromServer,
-  QuerySnapshot,
   DocumentData,
 } from "firebase/firestore";
 
