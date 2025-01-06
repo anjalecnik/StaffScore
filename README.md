@@ -1,6 +1,6 @@
 <p align="center">
   <img alt="StaffScore Logo" src="https://github.com/anjalecnik/StaffScore/assets/108223734/1145b321-b153-4843-ad3f-88f9f53b29db" >
-</p>
+</p> 
 
 # StaffScore 🏆
 Welcome to **StaffScore**, a web application designed to help team leaders track and evaluate the performance of their team members effortlessly.
